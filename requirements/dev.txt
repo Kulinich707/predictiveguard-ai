@@ -1,0 +1,7 @@
+-r web.txt
+httpx>=0.28.0,<1.0.0
+pre-commit>=4.3.0,<5.0.0
+pytest>=8.4.0,<10.0.0
+pytest-asyncio>=1.1.0,<2.0.0
+pytest-cov>=6.2.0,<8.0.0
+ruff>=0.12.0,<1.0.0

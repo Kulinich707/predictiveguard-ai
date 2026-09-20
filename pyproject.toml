@@ -1,0 +1,43 @@
+[project]
+name = "predictiveguard-ai"
+version = "0.1.0"
+description = "PredictiveGuard AI service"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.30.0,<1.0.0",
+    "fastapi>=0.116.0,<1.0.0",
+    "pydantic-settings>=2.10.0,<3.0.0",
+    "uvicorn[standard]>=0.35.0,<1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.0,<1.0.0",
+    "pre-commit>=4.3.0,<5.0.0",
+    "pytest>=8.4.0,<9.0.0",
+    "pytest-asyncio>=1.1.0,<2.0.0",
+    "pytest-cov>=6.2.0,<7.0.0",
+    "ruff>=0.12.0,<1.0.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=src/predictiveguard --cov-report=term-missing --cov-fail-under=90"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/predictiveguard"]
