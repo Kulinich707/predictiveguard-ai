@@ -1,52 +1,87 @@
 from unittest.mock import AsyncMock, patch
 
-from fastapi.testclient import TestClient
+import pytest
+from httpx import ASGITransport, AsyncClient
 
 from predictiveguard.main import app
+from predictiveguard.schemas import ComponentHealth
 
-client = TestClient(app)
+
+@pytest.fixture
+async def client():
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as async_client:
+        yield async_client
 
 
-def test_healthz() -> None:
-    response = client.get("/healthz")
+@pytest.mark.asyncio
+async def test_healthz(client: AsyncClient) -> None:
+    response = await client.get("/healthz")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+    assert response.headers["X-Request-ID"]
+    assert float(response.headers["X-Process-Time-Ms"]) >= 0
 
 
-def test_version() -> None:
-    response = client.get("/api/v1/version")
+@pytest.mark.asyncio
+async def test_healthz_preserves_request_id(client: AsyncClient) -> None:
+    response = await client.get("/healthz", headers={"X-Request-ID": "test-request"})
+
+    assert response.status_code == 200
+    assert response.headers["X-Request-ID"] == "test-request"
+
+
+@pytest.mark.asyncio
+async def test_version(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/version")
 
     assert response.status_code == 200
     assert response.json()["version"] == "0.1.0"
 
 
-def test_health() -> None:
-    component = {
-        "name": "postgresql",
-        "version": "17.6",
-        "response_time_ms": 1.234,
-    }
+@pytest.mark.asyncio
+async def test_health(client: AsyncClient) -> None:
+    component = ComponentHealth(
+        name="postgresql",
+        status="healthy",
+        version="17.6",
+        response_time_ms=1.234,
+    )
 
     with patch(
         "predictiveguard.api.routes.get_postgres_health",
         new=AsyncMock(return_value=component),
     ):
-        response = client.get("/api/v1/health")
+        response = await client.get("/api/v1/health")
 
     assert response.status_code == 200
     assert response.json() == {
         "status": "ok",
-        "components": [component],
+        "components": [component.model_dump()],
     }
 
 
-def test_health_when_postgres_is_unavailable() -> None:
+@pytest.mark.asyncio
+async def test_health_when_postgres_is_unavailable(client: AsyncClient) -> None:
+    component = ComponentHealth(
+        name="postgresql",
+        status="unavailable",
+        version=None,
+        response_time_ms=3000.0,
+        detail="TimeoutError",
+    )
+
     with patch(
         "predictiveguard.api.routes.get_postgres_health",
-        new=AsyncMock(side_effect=RuntimeError("connection failed")),
+        new=AsyncMock(return_value=component),
     ):
-        response = client.get("/api/v1/health")
+        response = await client.get("/api/v1/health")
 
     assert response.status_code == 503
-    assert response.json() == {"detail": "PostgreSQL is unavailable"}
+    assert response.json() == {
+        "status": "degraded",
+        "components": [component.model_dump()],
+    }

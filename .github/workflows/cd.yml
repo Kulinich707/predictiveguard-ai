@@ -10,24 +10,46 @@ permissions:
   packages: write
 
 jobs:
-  publish:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.11.7"
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
       - name: Validate tag matches project version
         shell: bash
         run: |
-          PROJECT_VERSION=$(python - <<'PY'
-          import tomllib
-          with open("pyproject.toml", "rb") as file:
-              print(tomllib.load(file)["project"]["version"])
-          PY
-          )
+          PROJECT_VERSION=$(uv run python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           test "$PROJECT_VERSION" = "$TAG_VERSION"
+
+      - name: Quality checks
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run pytest
+          uv run pre-commit run --all-files
+
+  publish:
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -49,6 +71,8 @@ jobs:
         with:
           context: .
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ steps.image.outputs.name }}:${{ github.ref_name }}
             ${{ steps.image.outputs.name }}:latest

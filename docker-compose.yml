@@ -2,33 +2,85 @@ services:
   app:
     build:
       context: .
+    init: true
+    restart: unless-stopped
     environment:
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
-      POSTGRES_DB: predictiveguard
-      POSTGRES_USER: predictiveguard
-      POSTGRES_PASSWORD: predictiveguard
+      POSTGRES_DB: ${POSTGRES_DB:-predictiveguard}
+      POSTGRES_USER: ${POSTGRES_USER:-predictiveguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predictiveguard}
+      POSTGRES_CONNECT_TIMEOUT_SECONDS: ${POSTGRES_CONNECT_TIMEOUT_SECONDS:-3}
+      POSTGRES_COMMAND_TIMEOUT_SECONDS: ${POSTGRES_COMMAND_TIMEOUT_SECONDS:-3}
+      POSTGRES_HEALTH_TIMEOUT_SECONDS: ${POSTGRES_HEALTH_TIMEOUT_SECONDS:-5}
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    networks:
+      - predictiveguard
 
   db:
     image: postgres:17-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: predictiveguard
-      POSTGRES_USER: predictiveguard
-      POSTGRES_PASSWORD: predictiveguard
+      POSTGRES_DB: ${POSTGRES_DB:-predictiveguard}
+      POSTGRES_USER: ${POSTGRES_USER:-predictiveguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predictiveguard}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U predictiveguard -d predictiveguard"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-predictiveguard} -d ${POSTGRES_DB:-predictiveguard}",
+        ]
       interval: 5s
       timeout: 3s
       retries: 10
+      start_period: 5s
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    networks:
+      - predictiveguard
 
 volumes:
   postgres_data:
+
+networks:
+  predictiveguard:
+    driver: bridge
