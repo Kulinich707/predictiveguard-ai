@@ -2,6 +2,8 @@ name: CD
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*.*.*"
 
@@ -30,6 +32,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Validate tag matches project version
+        if: github.ref_type == 'tag'
         shell: bash
         run: |
           PROJECT_VERSION=$(uv run python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
@@ -61,10 +64,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare image name
+      - name: Prepare image tags
         id: image
         shell: bash
-        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            TAGS="$IMAGE:$GITHUB_REF_NAME"
+          else
+            TAGS="$IMAGE:sha-${GITHUB_SHA::12}"$'\n'"$IMAGE:latest"
+          fi
+          {
+            echo 'tags<<EOF'
+            printf '%s\n' "$TAGS"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -74,5 +88,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
-            ${{ steps.image.outputs.name }}:${{ github.ref_name }}
-            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.tags }}

@@ -1,3 +1,4 @@
+from importlib.metadata import version
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -39,7 +40,7 @@ async def test_version(client: AsyncClient) -> None:
     response = await client.get("/api/v1/version")
 
     assert response.status_code == 200
-    assert response.json()["version"] == "0.1.0"
+    assert response.json()["version"] == version("predictiveguard-ai")
 
 
 @pytest.mark.asyncio
