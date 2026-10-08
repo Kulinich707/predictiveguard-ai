@@ -1,11 +1,12 @@
 from importlib.metadata import version
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, PropertyMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from predictiveguard.main import app
-from predictiveguard.schemas import ComponentHealth
+from predictiveguard.model_service import model_service
+from predictiveguard.schemas import ComponentHealth, ModelMetadata, ProcessResponse
 
 
 @pytest.fixture
@@ -86,3 +87,69 @@ async def test_health_when_postgres_is_unavailable(client: AsyncClient) -> None:
         "status": "degraded",
         "components": [component.model_dump()],
     }
+
+
+@pytest.mark.asyncio
+async def test_process(client: AsyncClient) -> None:
+    prediction = ProcessResponse(
+        prediction="failure",
+        failure_probability=0.82,
+        model=ModelMetadata(
+            name="PredictiveGuardFailureModel",
+            alias="champion",
+            version="3",
+            run_id="run-123",
+        ),
+    )
+    payload = {
+        "type": "L",
+        "air_temperature_k": 302.1,
+        "process_temperature_k": 314.2,
+        "rotational_speed_rpm": 1100,
+        "torque_nm": 64.3,
+        "tool_wear_min": 220,
+    }
+    with (
+        patch.object(type(model_service), "is_ready", new_callable=PropertyMock, return_value=True),
+        patch.object(model_service, "predict", return_value=prediction),
+    ):
+        response = await client.post("/process", json=payload)
+
+    assert response.status_code == 200
+    assert response.json() == prediction.model_dump()
+
+
+@pytest.mark.asyncio
+async def test_process_when_model_is_not_loaded(client: AsyncClient) -> None:
+    payload = {
+        "type": "L",
+        "air_temperature_k": 300,
+        "process_temperature_k": 310,
+        "rotational_speed_rpm": 1500,
+        "torque_nm": 40,
+        "tool_wear_min": 100,
+    }
+    with patch.object(
+        type(model_service), "is_ready", new_callable=PropertyMock, return_value=False
+    ):
+        response = await client.post("/process", json=payload)
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "ML model is not loaded"}
+
+
+@pytest.mark.asyncio
+async def test_process_validates_sensor_ranges(client: AsyncClient) -> None:
+    response = await client.post(
+        "/process",
+        json={
+            "type": "L",
+            "air_temperature_k": 999,
+            "process_temperature_k": 310,
+            "rotational_speed_rpm": 1500,
+            "torque_nm": 40,
+            "tool_wear_min": 100,
+        },
+    )
+
+    assert response.status_code == 422

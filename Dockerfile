@@ -8,15 +8,17 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
+    UV_NO_CACHE=1 \
     PATH="/app/.venv/bin:$PATH"
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-COPY src ./src
+COPY --chown=10001:10001 src ./src
+COPY --chown=10001:10001 ml ./ml
+COPY --chown=10001:10001 data ./data
 RUN uv sync --frozen --no-dev \
-    && useradd --create-home --uid 10001 appuser \
-    && chown -R appuser:appuser /app
+    && useradd --create-home --uid 10001 appuser
 
 USER appuser
 

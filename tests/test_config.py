@@ -20,3 +20,5 @@ def test_operational_defaults() -> None:
     assert settings.postgres_connect_timeout_seconds == 3.0
     assert settings.postgres_command_timeout_seconds == 3.0
     assert settings.postgres_health_timeout_seconds == 5.0
+    assert settings.mlflow_tracking_uri == "http://127.0.0.1:5050"
+    assert settings.model_uri == "models:/PredictiveGuardFailureModel@champion"

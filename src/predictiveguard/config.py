@@ -21,12 +21,20 @@ class Settings(BaseSettings):
     postgres_command_timeout_seconds: float = 3.0
     postgres_health_timeout_seconds: float = 5.0
 
+    mlflow_tracking_uri: str = "http://127.0.0.1:5050"
+    model_name: str = "PredictiveGuardFailureModel"
+    model_alias: str = "champion"
+
     @property
     def postgres_dsn(self) -> str:
         return (
             f"postgresql://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+
+    @property
+    def model_uri(self) -> str:
+        return f"models:/{self.model_name}@{self.model_alias}"
 
 
 settings = Settings()
