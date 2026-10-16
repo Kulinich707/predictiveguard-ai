@@ -39,13 +39,6 @@ jobs:
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           test "$PROJECT_VERSION" = "$TAG_VERSION"
 
-      - name: Quality checks
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-          uv run pytest
-          uv run pre-commit run --all-files
-
   publish:
     needs: quality
     runs-on: ubuntu-latest

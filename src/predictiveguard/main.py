@@ -1,17 +1,32 @@
 import logging
+from contextlib import asynccontextmanager
 from time import perf_counter
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
+from starlette.concurrency import run_in_threadpool
 
 from predictiveguard.api.routes import router
 from predictiveguard.config import settings
 from predictiveguard.logging_config import bind_request_id, configure_logging, reset_request_id
+from predictiveguard.model_service import model_service
+from predictiveguard.version import get_app_version
 
 configure_logging(settings.log_level)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="PredictiveGuard AI")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    await run_in_threadpool(model_service.load, settings)
+    logger.info(
+        "ML model loaded from Registry",
+        extra={"model_uri": settings.model_uri},
+    )
+    yield
+
+
+app = FastAPI(title="PredictiveGuard AI", version=get_app_version(), lifespan=lifespan)
 app.include_router(router)
 
 
