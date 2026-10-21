@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,18 @@ class Settings(BaseSettings):
     mlflow_tracking_uri: str = "http://127.0.0.1:5050"
     model_name: str = "PredictiveGuardFailureModel"
     model_alias: str = "champion"
+
+    rabbit_url: str = "amqp://guest:guest@localhost:5672/"
+    task_queue: str = "predictiveguard.tasks"
+    queue_max_length: int = Field(default=100, ge=0)
+    prefetch_count: int = Field(default=1, ge=1)
+    worker_concurrency: int = Field(default=1, ge=1)
+    inference_delay_seconds: float = Field(default=0.5, ge=0)
+    max_attempts: int = Field(default=3, ge=1)
+    publish_timeout_seconds: float = Field(default=1.0, gt=0)
+    retry_delay_seconds: float = Field(default=0.1, gt=0)
+    shutdown_timeout_seconds: float = Field(default=30, gt=0)
+    worker_health_port: int = 8001
 
     @property
     def postgres_dsn(self) -> str:

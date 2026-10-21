@@ -1,0 +1,127 @@
+{
+  "capacity": 10,
+  "workers": 0,
+  "requests": [
+    {
+      "task_id": "27611d72-187d-4310-88e6-5a8ddbbe16df",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 18.146415939554572
+    },
+    {
+      "task_id": "8e8aae34-e2c9-4ae4-92c3-829cab85bcc2",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 6.116291042417288
+    },
+    {
+      "task_id": "0a380b51-b929-44d5-8c71-590a43cfa1bd",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.230082966387272
+    },
+    {
+      "task_id": "aace3510-1a19-43a0-a312-54e2fdd4a938",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.1357920272275805
+    },
+    {
+      "task_id": "2a7bd0b8-be6c-455b-a59b-3f875cc3346b",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.130542045459151
+    },
+    {
+      "task_id": "593df5c1-1311-4b39-a62b-addbb5058732",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.605041001923382
+    },
+    {
+      "task_id": "1a744224-719e-476d-982b-4242ef462952",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 3.982083988375962
+    },
+    {
+      "task_id": "e5e10093-f38f-4b0b-8b2c-a2827c8e23a4",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 3.8174999644979835
+    },
+    {
+      "task_id": "48e69e4e-7e14-4152-aeef-4e64afd95d13",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 3.51070798933506
+    },
+    {
+      "task_id": "87984f96-4a4a-404d-bd04-7fb1d6941405",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.778832895681262
+    },
+    {
+      "task_id": "8c49e253-e6ed-43d5-b7bf-1d99c195c6a5",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 6.0321250930428505
+    },
+    {
+      "task_id": "49b7402c-71c3-4efb-a97c-35e6ec22e7a2",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.150624969042838
+    },
+    {
+      "task_id": "7443bfb8-6a98-43b9-8803-7d1a77fb5e25",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.20437497086823
+    },
+    {
+      "task_id": "34115799-e4aa-4320-9018-5bb77bef83c0",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 5.333542008884251
+    },
+    {
+      "task_id": "3efffea1-5a02-4c6a-a0f8-140400d81ea7",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.139167023822665
+    },
+    {
+      "task_id": "e655f090-0754-4cd5-80e7-11e31a43ac71",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.473207984119654
+    },
+    {
+      "task_id": "ca20a7db-66fb-4066-844f-897bd7623167",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 9.397000074386597
+    },
+    {
+      "task_id": "7ddc0041-4b43-4e8e-b1da-0889012a6f9a",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 5.987333948723972
+    },
+    {
+      "task_id": "6232b8d1-f497-418f-9dd0-bbae9a06d235",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 7.014542003162205
+    },
+    {
+      "task_id": "3385756e-bbb6-4a39-b6fa-069092db81d2",
+      "status": 503,
+      "retry_after": "1",
+      "response_ms": 4.853041958995163
+    }
+  ],
+  "remaining_task_rows": 0
+}

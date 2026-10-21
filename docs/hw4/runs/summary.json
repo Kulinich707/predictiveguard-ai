@@ -1,0 +1,90 @@
+[
+  {
+    "scenario": "unbounded_one",
+    "count": 60,
+    "capacity": 0,
+    "delay": 0.5,
+    "initial_workers": 1,
+    "scale_at": null,
+    "source_seconds": 0.7050980830099434,
+    "drain_seconds": 32.09244391694665,
+    "max_ready": 53,
+    "max_unacked": 1,
+    "http_503": 0,
+    "reconciled_ids": 60,
+    "missing_ids": [],
+    "platform": "darwin",
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    }
+  },
+  {
+    "scenario": "bounded_one",
+    "count": 60,
+    "capacity": 10,
+    "delay": 0.5,
+    "initial_workers": 1,
+    "scale_at": null,
+    "source_seconds": 25.502668375032954,
+    "drain_seconds": 31.520230791997164,
+    "max_ready": 10,
+    "max_unacked": 1,
+    "http_503": 0,
+    "reconciled_ids": 60,
+    "missing_ids": [],
+    "platform": "darwin",
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    }
+  },
+  {
+    "scenario": "bounded_two",
+    "count": 60,
+    "capacity": 10,
+    "delay": 0.5,
+    "initial_workers": 2,
+    "scale_at": null,
+    "source_seconds": 12.628672000020742,
+    "drain_seconds": 16.09131733304821,
+    "max_ready": 10,
+    "max_unacked": 2,
+    "http_503": 0,
+    "reconciled_ids": 60,
+    "missing_ids": [],
+    "platform": "darwin",
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    }
+  },
+  {
+    "scenario": "dynamic_two",
+    "count": 60,
+    "capacity": 10,
+    "delay": 0.5,
+    "initial_workers": 1,
+    "scale_at": 8.0,
+    "source_seconds": 17.775945291970856,
+    "drain_seconds": 21.302158916951157,
+    "max_ready": 10,
+    "max_unacked": 2,
+    "http_503": 0,
+    "reconciled_ids": 60,
+    "missing_ids": [],
+    "platform": "darwin",
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    }
+  }
+]

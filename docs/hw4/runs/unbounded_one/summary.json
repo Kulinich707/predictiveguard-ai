@@ -1,0 +1,22 @@
+{
+  "scenario": "unbounded_one",
+  "count": 60,
+  "capacity": 0,
+  "delay": 0.5,
+  "initial_workers": 1,
+  "scale_at": null,
+  "source_seconds": 0.7050980830099434,
+  "drain_seconds": 32.09244391694665,
+  "max_ready": 53,
+  "max_unacked": 1,
+  "http_503": 0,
+  "reconciled_ids": 60,
+  "missing_ids": [],
+  "platform": "darwin",
+  "model": {
+    "name": "PredictiveGuardFailureModel",
+    "alias": "champion",
+    "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+    "version": "4"
+  }
+}

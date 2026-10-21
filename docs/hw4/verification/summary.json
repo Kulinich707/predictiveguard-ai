@@ -1,0 +1,220 @@
+{
+  "checked_at": "2026-10-21T14:11:05.842085+03:00",
+  "branch": "backpressure",
+  "tests": {
+    "passed": 50,
+    "coverage_percent": 96.11,
+    "log": "pytest.txt"
+  },
+  "quality": {
+    "ruff": "passed",
+    "format": "passed",
+    "lock": "passed",
+    "diff": "passed",
+    "precommit": "passed",
+    "docker_build": "passed",
+    "compose_config": "passed"
+  },
+  "experiments": [
+    {
+      "scenario": "unbounded_one",
+      "count": 60,
+      "capacity": 0,
+      "delay": 0.5,
+      "initial_workers": 1,
+      "scale_at": null,
+      "source_seconds": 0.7050980830099434,
+      "drain_seconds": 32.09244391694665,
+      "max_ready": 53,
+      "max_unacked": 1,
+      "http_503": 0,
+      "reconciled_ids": 60,
+      "missing_ids": [],
+      "platform": "darwin",
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      }
+    },
+    {
+      "scenario": "bounded_one",
+      "count": 60,
+      "capacity": 10,
+      "delay": 0.5,
+      "initial_workers": 1,
+      "scale_at": null,
+      "source_seconds": 25.502668375032954,
+      "drain_seconds": 31.520230791997164,
+      "max_ready": 10,
+      "max_unacked": 1,
+      "http_503": 0,
+      "reconciled_ids": 60,
+      "missing_ids": [],
+      "platform": "darwin",
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      }
+    },
+    {
+      "scenario": "bounded_two",
+      "count": 60,
+      "capacity": 10,
+      "delay": 0.5,
+      "initial_workers": 2,
+      "scale_at": null,
+      "source_seconds": 12.628672000020742,
+      "drain_seconds": 16.09131733304821,
+      "max_ready": 10,
+      "max_unacked": 2,
+      "http_503": 0,
+      "reconciled_ids": 60,
+      "missing_ids": [],
+      "platform": "darwin",
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      }
+    },
+    {
+      "scenario": "dynamic_two",
+      "count": 60,
+      "capacity": 10,
+      "delay": 0.5,
+      "initial_workers": 1,
+      "scale_at": 8.0,
+      "source_seconds": 17.775945291970856,
+      "drain_seconds": 21.302158916951157,
+      "max_ready": 10,
+      "max_unacked": 2,
+      "http_503": 0,
+      "reconciled_ids": 60,
+      "missing_ids": [],
+      "platform": "darwin",
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      }
+    }
+  ],
+  "reconciled_successful_tasks": 240,
+  "http_overload": {
+    "requests": 20,
+    "service_unavailable": 20,
+    "retry_after": "1",
+    "remaining_task_rows": 0
+  },
+  "services": {
+    "app": "healthy",
+    "app-db": "healthy",
+    "artifact-init": "exited",
+    "mlflow": "healthy",
+    "mlflow-db": "healthy",
+    "rabbitmq": "healthy",
+    "worker": "healthy"
+  },
+  "model": {
+    "name": "PredictiveGuardFailureModel",
+    "alias": "champion",
+    "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+    "version": "4"
+  },
+  "live_prediction": {
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    },
+    "prediction": "no_failure",
+    "failure_probability": 0.00158
+  },
+  "duplicate_attempts": 1,
+  "compose_source_tasks": [
+    {
+      "task_id": "bf7f0bcd-5eb0-5ea4-acca-403aa47e4842",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    },
+    {
+      "task_id": "86d18edb-f970-5fd4-a772-b346f0882227",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    },
+    {
+      "task_id": "a1352446-bdd7-5ebc-834a-a64e091fa98e",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    }
+  ],
+  "image_code": {
+    "app": "all service Python files match local checkout",
+    "worker": "all service Python files match local checkout"
+  },
+  "requirements": {
+    "1_architecture_alias_once": "verified: independent source/worker; real MLflow model loaded once by alias",
+    "2_broker_to_worker": "verified: explicit prefetch, concurrency 1/2, thread pool and worker health",
+    "3_worker_to_source": "verified: bounded queue, confirms, streaming CSV, retry backoff/jitter and four fresh experiments",
+    "4_external_api": "verified: 20/20 HTTP 503 with Retry-After; rejected task rows absent",
+    "5_reliability": "verified: persistent publication, result before ack, bounded model attempts, DLQ, idempotency and SIGTERM/SIGKILL tests",
+    "6_tests": "verified: TestRabbitBroker and real RabbitMQ/PostgreSQL Testcontainers",
+    "7_experiments": "verified: four fresh scenarios, 240 exact UUIDs reconciled, README/charts regenerated"
+  },
+  "evidence": {
+    "tests": "pytest.txt",
+    "docker_build": "docker-build.txt",
+    "current_compose_real_model": "submission_smoke.json",
+    "previous_full_stack_restart": "restart_and_smoke.json",
+    "previous_custom_settings_checks": "live_scenarios.json"
+  },
+  "source_sha256": {
+    "src/predictiveguard/queue.py": "a23b882e00c7a8d6f72f4efd95201ff24a9e0682a48bc838bf2789a83c204d21",
+    "src/predictiveguard/worker.py": "25451ebb51ac40e9c8f7776b3f13d1fbed5f711164e7f54f9f04fdecb0ffec7f",
+    "src/predictiveguard/db.py": "9a38df26f64e4265b42a83ead7379102d51b2911c482fab52a96098477a3cef4",
+    "src/predictiveguard/tasks.py": "f9278f0d6058684891080f34c8bfcc638417dba69a2ec1bc2e89207ee99b4f66",
+    "src/predictiveguard/config.py": "d7b4bd25978855839673aacf4102bc1d6dc2dc13bfc1efcfdb29905d449c89ea",
+    "src/predictiveguard/logging_config.py": "a75c38d5f4d4495b4ef86fd49fd8fed7c6bafdaef189d1170c45c130a2c630ff",
+    "src/predictiveguard/version.py": "1c3efcf4a507471d867f0a7aa355a50951c1b4ef486a290d15172eb58585abd1",
+    "src/predictiveguard/task_store.py": "bb0771c94d2a9850313c18713bcd87398c250cf87d8d7358ee2906ef61d56500",
+    "src/predictiveguard/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/predictiveguard/model_service.py": "c875b41ec734f92cabf914eb1307ad2b182f20b0c3ad70c813af2c0b72dc020d",
+    "src/predictiveguard/schemas.py": "b8f29a05318cfdc89c5941173ad3bdfdafe2333221f90ece1c04823f71e7e244",
+    "src/predictiveguard/inference.py": "6889f1ced91834085d8663669fcd3f001f050113406172aa8f9682c1191d82cc",
+    "src/predictiveguard/main.py": "28ea944f0fa7de96bf549554fecf973f0b9d5e558501b2b3c044bca5fc97a6e5",
+    "src/predictiveguard/source.py": "3b9f9ae1c86afa24394fbef691817fcdbbf7aab7a856017a4bf85b20389c4632",
+    "src/predictiveguard/api/tasks.py": "fd414f998acb66beeaab746593b2ce53035f1c0f92bb3dae9a68856fbb280a6e",
+    "src/predictiveguard/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/predictiveguard/api/routes.py": "297b33e294504fc94a226fd7312996ec1794fc000b380ef20c3b61bb3a6d6d2e",
+    "ml/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ml/train.py": "4c2f42c9e44b0fc674383eeab63264142e178c8856f4b66e066401e67c8d4ba1",
+    "scripts/hw4_http_probe.py": "0290141e025c34a3ddd8845ed7beb1b2297aad6ee4553161f7546b61bf82287b",
+    "scripts/hw4_report.py": "0bfa125e7003b6f5c95172e3b5ec071fa62b7ca2c3d8f41d35058f663b4ab02d",
+    "scripts/hw4_experiment.py": "9f6a5ec37da8da3bfb2e69ff542f730aec9ac925e144790ac6f1c14d7ebb4b8e",
+    "tests/test_version.py": "1253e86b5d189346963cc03cfa0e5a945ae193356871fbcd7f552ca4821392d1",
+    "tests/conftest.py": "e70b389d091981773d7e954afc743734cdd62bf70fd2c52f1e1a06ed18d9b889",
+    "tests/test_db.py": "830668dc6855203df4893bcdabf310485231b6a2511455fe99f62de69916be32",
+    "tests/test_source.py": "547ccfe4cfbb8b1ad18ff983f034d6b97b7a9949c640efb82f783397926c067e",
+    "tests/test_worker.py": "9888d5b023636ad41e682218df49e6cb977949c7e1c6dcaf4895a92e71b14a9a",
+    "tests/test_config.py": "51f7ca5e1d227b32e90ee4f7c57fb2b412705fd3336c8ced06d46ebb77f0b708",
+    "tests/test_model_service.py": "4d673980a5bafc677966aa90f0122009550517e20abb0a4ab7f229c5a8ea5248",
+    "tests/test_api.py": "a2a2b60f2829cf0ded4a95af2901a755fdf1568323a9fdb92147968cf45927fe",
+    "tests/test_ml_workflow.py": "eb0df0bf5b14c7e29a1a45a968631fc6593df32f3bbeb6be0c8bd877e3be54cc",
+    "tests/integration/conftest.py": "f4fc93b122ec5d165917098e98ef66592316b7926a48237614e9f8cf35fa0318",
+    "tests/integration/test_compose.py": "498eac1ad99f48f0bdb7e59084e6835f3df06e678c0e1409134ec01b2fdb3a16",
+    "tests/integration/test_pipeline.py": "18b7216d054eeac62dab740141ab9cf253bd05eb9113159f0a85a1adceeba64f"
+  },
+  "limits": [
+    "Full training notebook was not rerun during this check; model roundtrip and alias tests passed, existing champion was used for fresh real inference.",
+    "SIGTERM/SIGKILL integration scenarios use a stub model; load experiments and Compose smoke use the real model.",
+    "Historical restart/custom-settings evidence retains its original date.",
+    "Final commit, push and submission were not performed."
+  ]
+}
