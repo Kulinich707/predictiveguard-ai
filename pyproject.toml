@@ -16,6 +16,9 @@ dependencies = [
     "scikit-learn>=1.6.0,<2.0.0",
     "seaborn>=0.13.0,<1.0.0",
     "uvicorn[standard]>=0.35.0,<1.0.0",
+    "faststream[rabbit]>=0.6.0,<0.7.0",
+    "aiohttp>=3.12,<4",
+    "psutil>=7,<8",
 ]
 
 [dependency-groups]
@@ -28,10 +31,12 @@ dev = [
     "pytest-asyncio>=1.1.0,<2.0.0",
     "pytest-cov>=6.2.0,<7.0.0",
     "ruff>=0.12.0,<1.0.0",
+    "testcontainers[postgres,rabbitmq]>=4.13,<5",
 ]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+markers = ["integration: requires real Docker containers"]
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "--cov=src/predictiveguard --cov-report=term-missing --cov-fail-under=90"

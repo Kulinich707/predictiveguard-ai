@@ -19,42 +19,53 @@ services:
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MODEL_NAME: ${MODEL_NAME:-PredictiveGuardFailureModel}
       MODEL_ALIAS: ${MODEL_ALIAS:-champion}
+      RABBIT_URL: amqp://predictiveguard:predictiveguard@rabbitmq:5672/
+      TASK_QUEUE: ${TASK_QUEUE:-predictiveguard.tasks}
+      QUEUE_MAX_LENGTH: ${QUEUE_MAX_LENGTH:-100}
+      RETRY_DELAY_SECONDS: ${RETRY_DELAY_SECONDS:-0.1}
+      PUBLISH_TIMEOUT_SECONDS: ${PUBLISH_TIMEOUT_SECONDS:-1}
+      INFERENCE_DELAY_SECONDS: ${INFERENCE_DELAY_SECONDS:-0.5}
     ports:
-      - "8000:8000"
+    - 8000:8000
     depends_on:
-      app-db:
+      app-db: &id002
         condition: service_healthy
-      mlflow:
+      mlflow: &id003
+        condition: service_healthy
+      rabbitmq: &id004
         condition: service_healthy
     healthcheck:
       test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)",
-        ]
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz',
+        timeout=3)
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 15s
-    logging: &default-logging
+    logging: &id001
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: 10m
+        max-file: '3'
     deploy:
       resources:
         limits:
-          cpus: "1.0"
+          cpus: '1.0'
           memory: 1G
-    networks: [predictiveguard]
-
+    networks:
+    - predictiveguard
   trainer:
-    profiles: [training]
+    profiles:
+    - training
     build:
       context: .
-    command: ["python", "-m", "ml.train"]
+    command:
+    - python
+    - -m
+    - ml.train
     environment:
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-predictiveguard-ai4i}
@@ -65,60 +76,62 @@ services:
     depends_on:
       mlflow:
         condition: service_healthy
-    restart: "no"
+    restart: 'no'
     healthcheck:
       disable: true
-    logging: *default-logging
-    networks: [predictiveguard]
-
+    logging: *id001
+    networks:
+    - predictiveguard
   mlflow:
     build:
       context: .
     command:
-      - mlflow
-      - server
-      - --host=0.0.0.0
-      - --port=5000
-      - --allowed-hosts=mlflow:5000,localhost:*,127.0.0.1:*,0.0.0.0:*
-      - --backend-store-uri=postgresql+psycopg2://${MLFLOW_DB_USER:-mlflow}:${MLFLOW_DB_PASSWORD:-mlflow}@mlflow-db:5432/${MLFLOW_DB_NAME:-mlflow}
-      - --artifacts-destination=/mlflow/artifacts
+    - mlflow
+    - server
+    - --host=0.0.0.0
+    - --port=5000
+    - --allowed-hosts=mlflow:5000,localhost:*,127.0.0.1:*,0.0.0.0:*
+    - --backend-store-uri=postgresql+psycopg2://${MLFLOW_DB_USER:-mlflow}:${MLFLOW_DB_PASSWORD:-mlflow}@mlflow-db:5432/${MLFLOW_DB_NAME:-mlflow}
+    - --artifacts-destination=/mlflow/artifacts
     ports:
-      - "5050:5000"
+    - 5050:5000
     depends_on:
       mlflow-db:
         condition: service_healthy
       artifact-init:
         condition: service_completed_successfully
     volumes:
-      - mlflow_artifacts:/mlflow/artifacts
+    - mlflow_artifacts:/mlflow/artifacts
     healthcheck:
       test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3)",
-        ]
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health',
+        timeout=3)
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 20s
     restart: unless-stopped
-    logging: *default-logging
-    networks: [predictiveguard]
-
+    logging: *id001
+    networks:
+    - predictiveguard
   artifact-init:
     build:
       context: .
-    command: ["sh", "-c", "chown -R 10001:10001 /mlflow/artifacts"]
-    user: "0:0"
+    command:
+    - sh
+    - -c
+    - chown -R 10001:10001 /mlflow/artifacts
+    user: 0:0
     volumes:
-      - mlflow_artifacts:/mlflow/artifacts
-    restart: "no"
+    - mlflow_artifacts:/mlflow/artifacts
+    restart: 'no'
     healthcheck:
       disable: true
-    networks: [predictiveguard]
-
+    networks:
+    - predictiveguard
   app-db:
     image: postgres:17-alpine
     restart: unless-stopped
@@ -128,19 +141,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predictiveguard}
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-predictiveguard} -d ${POSTGRES_DB:-predictiveguard}",
-        ]
+      - CMD-SHELL
+      - pg_isready -U ${POSTGRES_USER:-predictiveguard} -d ${POSTGRES_DB:-predictiveguard}
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 5s
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    logging: *default-logging
-    networks: [predictiveguard]
-
+    - postgres_data:/var/lib/postgresql/data
+    logging: *id001
+    networks:
+    - predictiveguard
   mlflow-db:
     image: postgres:17-alpine
     restart: unless-stopped
@@ -150,24 +161,137 @@ services:
       POSTGRES_PASSWORD: ${MLFLOW_DB_PASSWORD:-mlflow}
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${MLFLOW_DB_USER:-mlflow} -d ${MLFLOW_DB_NAME:-mlflow}",
-        ]
+      - CMD-SHELL
+      - pg_isready -U ${MLFLOW_DB_USER:-mlflow} -d ${MLFLOW_DB_NAME:-mlflow}
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 5s
     volumes:
-      - mlflow_postgres_data:/var/lib/postgresql/data
-    logging: *default-logging
-    networks: [predictiveguard]
-
+    - mlflow_postgres_data:/var/lib/postgresql/data
+    logging: *id001
+    networks:
+    - predictiveguard
+  rabbitmq:
+    image: rabbitmq:4.1-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: predictiveguard
+      RABBITMQ_DEFAULT_PASS: predictiveguard
+    ports:
+    - 127.0.0.1:5672:5672
+    - 127.0.0.1:15672:15672
+    volumes:
+    - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test:
+      - CMD
+      - rabbitmq-diagnostics
+      - -q
+      - ping
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+    - predictiveguard
+  worker:
+    build:
+      context: .
+    init: true
+    command:
+    - python
+    - -m
+    - predictiveguard.worker
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      POSTGRES_HOST: app-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-predictiveguard}
+      POSTGRES_USER: ${POSTGRES_USER:-predictiveguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predictiveguard}
+      POSTGRES_CONNECT_TIMEOUT_SECONDS: ${POSTGRES_CONNECT_TIMEOUT_SECONDS:-3}
+      POSTGRES_COMMAND_TIMEOUT_SECONDS: ${POSTGRES_COMMAND_TIMEOUT_SECONDS:-3}
+      POSTGRES_HEALTH_TIMEOUT_SECONDS: ${POSTGRES_HEALTH_TIMEOUT_SECONDS:-5}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_NAME: ${MODEL_NAME:-PredictiveGuardFailureModel}
+      MODEL_ALIAS: ${MODEL_ALIAS:-champion}
+      RABBIT_URL: amqp://predictiveguard:predictiveguard@rabbitmq:5672/
+      TASK_QUEUE: ${TASK_QUEUE:-predictiveguard.tasks}
+      QUEUE_MAX_LENGTH: ${QUEUE_MAX_LENGTH:-100}
+      RETRY_DELAY_SECONDS: ${RETRY_DELAY_SECONDS:-0.1}
+      PUBLISH_TIMEOUT_SECONDS: ${PUBLISH_TIMEOUT_SECONDS:-1}
+      INFERENCE_DELAY_SECONDS: ${INFERENCE_DELAY_SECONDS:-0.5}
+      PREFETCH_COUNT: ${PREFETCH_COUNT:-1}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
+      MAX_ATTEMPTS: ${MAX_ATTEMPTS:-3}
+      WORKER_HEALTH_PORT: ${WORKER_HEALTH_PORT:-8001}
+      SHUTDOWN_TIMEOUT_SECONDS: ${SHUTDOWN_TIMEOUT_SECONDS:-30}
+    depends_on:
+      app-db: *id002
+      mlflow: *id003
+      rabbitmq: *id004
+    stop_grace_period: ${WORKER_STOP_GRACE_PERIOD:-45s}
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ['WORKER_HEALTH_PORT'] + '/healthz', timeout=2)
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 60s
+    networks:
+    - predictiveguard
+    restart: unless-stopped
+  source:
+    build:
+      context: .
+    profiles:
+    - batch
+    command:
+    - python
+    - -m
+    - predictiveguard.source
+    - --repeats
+    - '10'
+    - --manifest
+    - /tmp/accepted.jsonl
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      POSTGRES_HOST: app-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-predictiveguard}
+      POSTGRES_USER: ${POSTGRES_USER:-predictiveguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predictiveguard}
+      POSTGRES_CONNECT_TIMEOUT_SECONDS: ${POSTGRES_CONNECT_TIMEOUT_SECONDS:-3}
+      POSTGRES_COMMAND_TIMEOUT_SECONDS: ${POSTGRES_COMMAND_TIMEOUT_SECONDS:-3}
+      POSTGRES_HEALTH_TIMEOUT_SECONDS: ${POSTGRES_HEALTH_TIMEOUT_SECONDS:-5}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MODEL_NAME: ${MODEL_NAME:-PredictiveGuardFailureModel}
+      MODEL_ALIAS: ${MODEL_ALIAS:-champion}
+      RABBIT_URL: amqp://predictiveguard:predictiveguard@rabbitmq:5672/
+      TASK_QUEUE: ${TASK_QUEUE:-predictiveguard.tasks}
+      QUEUE_MAX_LENGTH: ${QUEUE_MAX_LENGTH:-100}
+      RETRY_DELAY_SECONDS: ${RETRY_DELAY_SECONDS:-0.1}
+      PUBLISH_TIMEOUT_SECONDS: ${PUBLISH_TIMEOUT_SECONDS:-1}
+      INFERENCE_DELAY_SECONDS: ${INFERENCE_DELAY_SECONDS:-0.5}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    networks:
+    - predictiveguard
 volumes:
-  postgres_data:
-  mlflow_postgres_data:
-  mlflow_artifacts:
-
+  postgres_data: null
+  mlflow_postgres_data: null
+  mlflow_artifacts: null
+  rabbitmq_data: null
 networks:
   predictiveguard:
     driver: bridge

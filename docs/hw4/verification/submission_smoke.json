@@ -1,0 +1,45 @@
+{
+  "services": {
+    "app": "healthy",
+    "app-db": "healthy",
+    "artifact-init": "exited",
+    "mlflow": "healthy",
+    "mlflow-db": "healthy",
+    "rabbitmq": "healthy",
+    "worker": "healthy"
+  },
+  "task_id": "bbb72aab-250c-4f96-a4f7-2b3dec8fcd22",
+  "status": "SUCCEEDED",
+  "result": {
+    "model": {
+      "name": "PredictiveGuardFailureModel",
+      "alias": "champion",
+      "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+      "version": "4"
+    },
+    "prediction": "no_failure",
+    "failure_probability": 0.00158
+  },
+  "duplicate_attempts": 1,
+  "image_code": {
+    "app": "all service Python files match local checkout",
+    "worker": "all service Python files match local checkout"
+  },
+  "compose_source_tasks": [
+    {
+      "task_id": "bf7f0bcd-5eb0-5ea4-acca-403aa47e4842",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    },
+    {
+      "task_id": "86d18edb-f970-5fd4-a772-b346f0882227",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    },
+    {
+      "task_id": "a1352446-bdd7-5ebc-834a-a64e091fa98e",
+      "status": "SUCCEEDED",
+      "attempts": 1
+    }
+  ]
+}

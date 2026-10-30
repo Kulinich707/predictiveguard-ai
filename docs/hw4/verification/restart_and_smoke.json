@@ -1,0 +1,79 @@
+{
+  "checked_at": "2026-10-20T20:43:59.607162+03:00",
+  "stop_then_start": "passed",
+  "preserved_task_rows": 8,
+  "databases": {
+    "app-db": "SELECT 1 passed",
+    "mlflow-db": "SELECT 1 passed"
+  },
+  "registry_alias": {
+    "name": "PredictiveGuardFailureModel",
+    "alias": "champion",
+    "version": "4",
+    "run_id": "3934d9456c434b06b1c592263ef6d6c5"
+  },
+  "before_restart": {
+    "task_id": "56d1b429-81b1-4c72-aea8-54b32f489e1a",
+    "status": "SUCCEEDED",
+    "attempts": 1,
+    "result": {
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      },
+      "prediction": "no_failure",
+      "failure_probability": 0.00158
+    },
+    "error": null,
+    "created_at": "2026-10-20T17:43:26.732077+00:00",
+    "updated_at": "2026-10-20T17:43:27.342692+00:00",
+    "inference_seconds": 0.02218491600069683,
+    "delay_seconds": 0.5005451670003822,
+    "total_seconds": 0.612629
+  },
+  "after_restart": {
+    "task_id": "45759b3b-2584-4a76-a9bc-91a33659529b",
+    "status": "SUCCEEDED",
+    "attempts": 1,
+    "result": {
+      "model": {
+        "name": "PredictiveGuardFailureModel",
+        "alias": "champion",
+        "run_id": "3934d9456c434b06b1c592263ef6d6c5",
+        "version": "4"
+      },
+      "prediction": "no_failure",
+      "failure_probability": 0.00158
+    },
+    "error": null,
+    "created_at": "2026-10-20T17:43:57.795941+00:00",
+    "updated_at": "2026-10-20T17:43:58.331789+00:00",
+    "inference_seconds": 0.01421104200562695,
+    "delay_seconds": 0.5003718750012922,
+    "total_seconds": 0.537951
+  },
+  "prediction_unchanged_after_restart": true,
+  "duplicate_attempts": 1,
+  "malformed_to_dlq": true,
+  "next_task_status": "SUCCEEDED",
+  "worker_health": {
+    "ready": true,
+    "active": 0
+  },
+  "http_health": {
+    "/healthz": 200,
+    "/api/v1/health": 200,
+    "/api/v1/version": 200,
+    "/openapi.json": 200
+  },
+  "services": {
+    "app": "healthy",
+    "app-db": "healthy",
+    "mlflow": "healthy",
+    "mlflow-db": "healthy",
+    "rabbitmq": "healthy",
+    "worker": "healthy"
+  }
+}

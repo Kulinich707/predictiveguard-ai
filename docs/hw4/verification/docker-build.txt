@@ -1,0 +1,322 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [app internal] load .dockerignore
+#1 transferring context: 174B done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 903B done
+#2 DONE 0.0s
+
+#3 [worker internal] load .dockerignore
+#3 transferring context: 174B done
+#3 DONE 0.0s
+
+#4 [worker internal] load build definition from Dockerfile
+#4 transferring dockerfile: 903B done
+#4 DONE 0.0s
+
+#5 [source internal] load build definition from Dockerfile
+#5 transferring dockerfile: 903B done
+#5 DONE 0.0s
+
+#6 [source internal] load .dockerignore
+#6 transferring context: 174B done
+#6 DONE 0.0s
+
+#7 [source internal] load metadata for ghcr.io/astral-sh/uv:0.11.7
+#7 DONE 1.1s
+
+#8 [source internal] load metadata for docker.io/library/python:3.12-slim
+#8 DONE 2.1s
+
+#9 [app] FROM ghcr.io/astral-sh/uv:0.11.7@sha256:240fb85ab0f263ef12f492d8476aa3a2e4e1e333f7d67fbdd923d00a506a516a
+#9 CACHED
+
+#10 [source internal] load build context
+#10 transferring context: 54.77kB 0.0s done
+#10 DONE 0.0s
+
+#11 [worker internal] load build context
+#11 transferring context: 54.77kB 0.0s done
+#11 DONE 0.0s
+
+#12 [app stage-0 1/9] FROM docker.io/library/python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2
+#12 resolve docker.io/library/python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2 done
+#12 ...
+
+#13 [app internal] load build context
+#13 transferring context: 1.58MB 0.0s done
+#13 DONE 0.1s
+
+#12 [app stage-0 1/9] FROM docker.io/library/python:3.12-slim@sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2
+#12 sha256:cb33f7f771ecec2ef1225cf39b159591a040391bd73e4c01f00fdfc4c47611d2 10.37kB / 10.37kB done
+#12 sha256:6c6ae3622772575c3ac02ecb2b02a06d05f19e1713a0cbff476ef37bca79e90f 1.75kB / 1.75kB done
+#12 sha256:7efd45553a98be3d940b73600550669831c0be34f30c521159e7030a91fcdee6 5.68kB / 5.68kB done
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 0B / 30.20MB 0.2s
+#12 sha256:d2bbc075e3cb52632dab161738fc7b1da0237cacc3e6aaf47f267963806d954b 0B / 1.27MB 0.2s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 0B / 12.06MB 0.2s
+#12 sha256:d2bbc075e3cb52632dab161738fc7b1da0237cacc3e6aaf47f267963806d954b 1.05MB / 1.27MB 0.7s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 1.05MB / 12.06MB 0.7s
+#12 sha256:d2bbc075e3cb52632dab161738fc7b1da0237cacc3e6aaf47f267963806d954b 1.27MB / 1.27MB 0.7s done
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 2.10MB / 12.06MB 0.9s
+#12 sha256:a65282cba7d0d44f1a66ad09c3b8ab769cace5eb9ad1bac7a9ee092738260f59 0B / 249B 0.9s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 3.15MB / 12.06MB 1.1s
+#12 sha256:a65282cba7d0d44f1a66ad09c3b8ab769cace5eb9ad1bac7a9ee092738260f59 249B / 249B 0.9s done
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 2.10MB / 30.20MB 1.2s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 4.19MB / 12.06MB 1.2s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 5.24MB / 12.06MB 1.4s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 6.29MB / 12.06MB 1.6s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 4.19MB / 30.20MB 2.0s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 7.34MB / 12.06MB 2.0s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 8.39MB / 12.06MB 2.1s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 9.44MB / 12.06MB 2.2s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 10.49MB / 12.06MB 2.4s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 12.06MB / 12.06MB 2.6s done
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 7.34MB / 30.20MB 2.8s
+#12 sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 12.06MB / 12.06MB 2.6s done
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 11.53MB / 30.20MB 3.2s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 14.68MB / 30.20MB 3.5s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 16.78MB / 30.20MB 3.7s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 19.92MB / 30.20MB 3.9s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 22.02MB / 30.20MB 4.1s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 25.17MB / 30.20MB 4.4s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 27.26MB / 30.20MB 4.6s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 30.20MB / 30.20MB 4.8s
+#12 sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 30.20MB / 30.20MB 4.8s done
+#12 extracting sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 0.1s
+#12 extracting sha256:ddc0c1e36a6793411b6c8d48e1ddad2987405d377da92bcf532ed3181c2e4d62 1.2s done
+#12 extracting sha256:d2bbc075e3cb52632dab161738fc7b1da0237cacc3e6aaf47f267963806d954b
+#12 extracting sha256:d2bbc075e3cb52632dab161738fc7b1da0237cacc3e6aaf47f267963806d954b 0.1s done
+#12 extracting sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 0.1s
+#12 extracting sha256:6c239cabb8a689216f641e0283334f236c708b4eff451e6a726acee3411f85f1 0.5s done
+#12 extracting sha256:a65282cba7d0d44f1a66ad09c3b8ab769cace5eb9ad1bac7a9ee092738260f59 done
+#12 DONE 6.9s
+
+#14 [app stage-0 2/9] WORKDIR /app
+#14 DONE 0.2s
+
+#15 [source stage-0 3/9] COPY --from=ghcr.io/astral-sh/uv:0.11.7 /uv /uvx /bin/
+#15 DONE 0.7s
+
+#16 [source stage-0 4/9] COPY pyproject.toml uv.lock ./
+#16 DONE 0.0s
+
+#17 [source stage-0 5/9] RUN uv sync --frozen --no-dev --no-install-project
+#17 0.325 Using CPython 3.12.15 interpreter at: /usr/local/bin/python3
+#17 0.325 Creating virtual environment at: .venv
+#17 0.714 Downloading cryptography (4.5MiB)
+#17 0.714 Downloading mlflow-tracing (1.9MiB)
+#17 0.714 Downloading scipy (32.4MiB)
+#17 0.716 Downloading matplotlib (10.2MiB)
+#17 0.716 Downloading sqlalchemy (4.5MiB)
+#17 0.718 Downloading numpy (15.0MiB)
+#17 0.718 Downloading pandas (11.2MiB)
+#17 0.719 Downloading aiohttp (1.8MiB)
+#17 0.720 Downloading mlflow (11.4MiB)
+#17 0.721 Downloading fonttools (5.2MiB)
+#17 0.722 Downloading asyncpg (3.3MiB)
+#17 0.724 Downloading pillow (6.0MiB)
+#17 0.724 Downloading plotly (9.2MiB)
+#17 0.725 Downloading pydantic-core (1.9MiB)
+#17 0.725 Downloading pyarrow (44.7MiB)
+#17 0.726 Downloading mlflow-skinny (3.9MiB)
+#17 0.726 Downloading scikit-learn (8.5MiB)
+#17 0.727 Downloading catboost (92.2MiB)
+#17 0.728 Downloading kiwisolver (1.2MiB)
+#17 0.728 Downloading databricks-sdk (1.0MiB)
+#17 0.728 Downloading psycopg2-binary (5.6MiB)
+#17 0.729 Downloading uvloop (4.1MiB)
+#17 4.074  Downloaded databricks-sdk
+#17 4.381  Downloaded kiwisolver
+#17 5.512  Downloaded aiohttp
+#17 5.551  Downloaded pydantic-core
+#17 5.644  Downloaded mlflow-tracing
+#17 8.106  Downloaded asyncpg
+#17 8.699  Downloaded mlflow-skinny
+#17 9.119  Downloaded uvloop
+#17 9.511  Downloaded sqlalchemy
+#17 9.645  Downloaded cryptography
+#17 10.31  Downloaded fonttools
+#17 11.02  Downloaded psycopg2-binary
+#17 11.32  Downloaded pillow
+#17 13.40  Downloaded scikit-learn
+#17 14.04  Downloaded plotly
+#17 14.57  Downloaded matplotlib
+#17 15.04  Downloaded pandas
+#17 15.16  Downloaded mlflow
+#17 16.74  Downloaded numpy
+#17 21.56  Downloaded scipy
+#17 23.95  Downloaded pyarrow
+#17 29.26  Downloaded catboost
+#17 29.27 Prepared 106 packages in 28.91s
+#17 46.09 Installed 106 packages in 16.81s
+#17 54.26 Bytecode compiled 10594 files in 8.17s
+#17 54.27  + aio-pika==9.6.2
+#17 54.27  + aiohappyeyeballs==2.7.1
+#17 54.27  + aiohttp==3.14.4
+#17 54.27  + aiormq==6.9.4
+#17 54.27  + aiosignal==1.4.0
+#17 54.27  + alembic==1.20.0
+#17 54.27  + annotated-doc==0.0.5
+#17 54.27  + annotated-types==0.8.0
+#17 54.27  + anyio==4.15.1
+#17 54.27  + asyncpg==0.31.0
+#17 54.27  + attrs==26.1.0
+#17 54.27  + blinker==1.9.0
+#17 54.27  + cachetools==7.2.1
+#17 54.27  + catboost==1.2.10
+#17 54.27  + certifi==2026.7.22
+#17 54.27  + cffi==2.1.1
+#17 54.27  + charset-normalizer==3.5.2
+#17 54.27  + click==8.5.0
+#17 54.27  + cloudpickle==3.1.2
+#17 54.27  + contourpy==1.4.0
+#17 54.27  + cryptography==50.0.2
+#17 54.27  + cycler==0.12.1
+#17 54.27  + databricks-sdk==0.148.0
+#17 54.27  + docker==7.2.0
+#17 54.27  + fast-depends==3.0.9
+#17 54.27  + fastapi==0.141.1
+#17 54.27  + faststream==0.6.7
+#17 54.27  + flask==3.1.3
+#17 54.27  + flask-cors==6.0.5
+#17 54.27  + fonttools==4.66.1
+#17 54.27  + frozenlist==1.8.0
+#17 54.27  + gitdb==4.0.12
+#17 54.27  + gitpython==3.2.0
+#17 54.27  + google-auth==2.61.0
+#17 54.27  + graphene==3.4.3
+#17 54.27  + graphql-core==3.2.13
+#17 54.27  + graphql-relay==3.2.0
+#17 54.27  + graphviz==0.21
+#17 54.27  + gunicorn==26.2.0
+#17 54.27  + h11==0.16.0
+#17 54.27  + httptools==0.8.0
+#17 54.27  + huey==3.4.0
+#17 54.27  + idna==3.20
+#17 54.27  + importlib-metadata==9.0.1
+#17 54.27  + itsdangerous==2.2.0
+#17 54.27  + jinja2==3.1.6
+#17 54.27  + joblib==1.6.0
+#17 54.27  + kiwisolver==1.5.1
+#17 54.27  + mako==1.4.3
+#17 54.27  + markupsafe==3.0.4
+#17 54.27  + matplotlib==3.11.2
+#17 54.27  + mlflow==3.17.0
+#17 54.27  + mlflow-skinny==3.17.0
+#17 54.27  + mlflow-tracing==3.17.0
+#17 54.27  + multidict==6.9.1
+#17 54.27  + narwhals==2.26.0
+#17 54.27  + numpy==2.5.3
+#17 54.27  + opentelemetry-api==1.45.1
+#17 54.27  + opentelemetry-proto==1.45.1
+#17 54.27  + opentelemetry-sdk==1.45.1
+#17 54.27  + opentelemetry-semantic-conventions==0.66b1
+#17 54.27  + packaging==26.3
+#17 54.27  + pamqp==3.3.0
+#17 54.27  + pandas==2.3.3
+#17 54.27  + pillow==12.3.0
+#17 54.27  + plotly==7.1.0
+#17 54.27  + prettytable==3.18.0
+#17 54.27  + propcache==0.5.4
+#17 54.27  + protobuf==6.33.6
+#17 54.27  + psutil==7.2.2
+#17 54.27  + psycopg2-binary==2.9.13
+#17 54.27  + pyarrow==25.0.1
+#17 54.27  + pyasn1==0.6.4
+#17 54.27  + pyasn1-modules==0.4.2
+#17 54.27  + pycparser==3.0
+#17 54.27  + pydantic==2.13.5
+#17 54.27  + pydantic-core==2.46.5
+#17 54.27  + pydantic-settings==2.15.0
+#17 54.27  + pyparsing==3.3.3
+#17 54.27  + python-dateutil==2.9.0.post0
+#17 54.27  + python-dotenv==1.2.3
+#17 54.27  + pytz==2026.5
+#17 54.27  + pyyaml==6.0.3
+#17 54.27  + requests==2.34.2
+#17 54.27  + scikit-learn==1.9.1
+#17 54.27  + scipy==1.18.1
+#17 54.27  + seaborn==0.13.2
+#17 54.27  + six==1.17.0
+#17 54.27  + skops==0.16.0
+#17 54.27  + smmap==5.0.3
+#17 54.27  + sqlalchemy==2.1.4
+#17 54.27  + sqlparse==0.6.0
+#17 54.27  + starlette==1.6.0
+#17 54.27  + threadpoolctl==3.7.0
+#17 54.27  + typing-extensions==4.16.0
+#17 54.27  + typing-inspection==0.4.4
+#17 54.27  + tzdata==2026.5
+#17 54.27  + urllib3==2.8.0
+#17 54.27  + uvicorn==0.53.0
+#17 54.27  + uvloop==0.22.1
+#17 54.27  + watchfiles==1.2.0
+#17 54.27  + wcwidth==0.9.2
+#17 54.27  + websockets==17.1
+#17 54.27  + werkzeug==3.1.9
+#17 54.27  + yarl==1.25.1
+#17 54.27  + zipp==4.1.1
+#17 DONE 55.2s
+
+#18 [app stage-0 4/9] COPY pyproject.toml uv.lock ./
+#18 CACHED
+
+#19 [app stage-0 5/9] RUN uv sync --frozen --no-dev --no-install-project
+#19 CACHED
+
+#20 [source stage-0 6/9] COPY --chown=10001:10001 src ./src
+#20 DONE 0.0s
+
+#21 [app stage-0 6/9] COPY --chown=10001:10001 src ./src
+#21 DONE 0.0s
+
+#22 [source stage-0 7/9] COPY --chown=10001:10001 ml ./ml
+#22 DONE 0.1s
+
+#23 [app stage-0 7/9] COPY --chown=10001:10001 ml ./ml
+#23 DONE 0.1s
+
+#24 [source stage-0 8/9] COPY --chown=10001:10001 data ./data
+#24 DONE 0.0s
+
+#25 [app stage-0 8/9] COPY --chown=10001:10001 data ./data
+#25 DONE 0.0s
+
+#26 [app stage-0 9/9] RUN uv sync --frozen --no-dev     && useradd --create-home --uid 10001 appuser
+#26 0.513    Building predictiveguard-ai @ file:///app
+#26 2.077       Built predictiveguard-ai @ file:///app
+#26 2.080 Prepared 1 package in 1.56s
+#26 2.082 Installed 1 package in 1ms
+#26 3.555 Bytecode compiled 10594 files in 1.47s
+#26 3.555  + predictiveguard-ai==0.2.0 (from file:///app)
+#26 DONE 3.8s
+
+#27 [source stage-0 9/9] RUN uv sync --frozen --no-dev     && useradd --create-home --uid 10001 appuser
+#27 0.535    Building predictiveguard-ai @ file:///app
+#27 2.182       Built predictiveguard-ai @ file:///app
+#27 2.208 Prepared 1 package in 1.67s
+#27 2.210 Installed 1 package in 1ms
+#27 3.742 Bytecode compiled 10594 files in 1.53s
+#27 3.742  + predictiveguard-ai==0.2.0 (from file:///app)
+#27 DONE 3.9s
+
+#28 [source] exporting to image
+#28 exporting layers
+#28 exporting layers 8.2s done
+#28 writing image sha256:0671585245e7d6c47d48cb009b9faf2c3275fe29ff9fc93d2ca69950e24fedf4 done
+#28 naming to docker.io/library/predictiveguard-ai-source 0.0s done
+#28 DONE 8.2s
+
+#29 [app] exporting to image
+#29 exporting layers 8.2s done
+#29 writing image sha256:363826ff2aef191bce3cd6da81f3f3c0086a851421c232877142c4581fd73eda done
+#29 naming to docker.io/library/predictiveguard-ai-app done
+#29 DONE 8.2s
+
+#30 [worker] exporting to image
+#30 exporting layers 8.2s done
+#30 writing image sha256:e69a5c0768c49cbb9862501b2c3fba9d983f7588488941d9c9e529b91969fcd0 done
+#30 naming to docker.io/library/predictiveguard-ai-worker done
+#30 DONE 8.2s

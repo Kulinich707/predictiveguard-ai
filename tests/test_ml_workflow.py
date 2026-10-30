@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from catboost import CatBoostClassifier
-from fastapi.testclient import TestClient
 from mlflow import MlflowClient
 from mlflow.models import infer_signature
 from sklearn.linear_model import LogisticRegression
@@ -27,8 +26,7 @@ from ml.train import (
 )
 from predictiveguard.config import Settings
 from predictiveguard.inference import FEATURES, FailurePredictor
-from predictiveguard.main import app
-from predictiveguard.model_service import ModelService, model_service
+from predictiveguard.model_service import ModelService
 from predictiveguard.schemas import ProcessRequest
 
 
@@ -122,7 +120,7 @@ def registry(tmp_path):
     mlflow.set_tracking_uri(previous)
 
 
-def test_real_registry_alias_switch_and_lifespan(registry):
+def test_real_registry_alias_switch(registry):
     client, versions, x = registry
     config = Settings(mlflow_tracking_uri=mlflow.get_tracking_uri(), model_name="roundtrip")
     service = ModelService()
@@ -134,29 +132,6 @@ def test_real_registry_alias_switch_and_lifespan(registry):
     assert service.predict(request) == first
     service.load(config)
     assert service.predict(request).model.version == str(versions[1].version)
-    # TestClient enters the actual FastAPI lifespan, unlike ASGITransport-only mocks.
-    previous = model_service._loaded
-    try:
-        with patch("predictiveguard.main.settings", config):
-            with TestClient(app) as http:
-                for _ in range(2):
-                    response = http.post("/process", json=request.model_dump())
-                    assert response.status_code == 200
-                    result = response.json()
-                    assert result["model"]["version"] == str(versions[1].version)
-                    expected = service.predict(request)
-                    assert result["failure_probability"] == expected.failure_probability
-                    assert result["prediction"] == expected.prediction
-                assert (
-                    http.post("/process", json={**request.model_dump(), "type": "X"}).status_code
-                    == 422
-                )
-                assert (
-                    http.post("/process", json={**request.model_dump(), "TWF": 1}).status_code
-                    == 422
-                )
-    finally:
-        model_service._loaded = previous
 
 
 def test_alias_resolved_only_once_even_if_it_changes_during_load():

@@ -14,3 +14,5 @@ htmlcov/
 catboost_info/
 mlruns/
 mlartifacts/
+
+docs/hw4/runs/**/*.log
