@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: predictiveguard
+    orgId: 1
+    folder: PredictiveGuard
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards

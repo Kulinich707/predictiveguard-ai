@@ -1,4 +1,6 @@
-from pydantic import Field
+from uuid import UUID
+
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,6 +39,13 @@ class Settings(BaseSettings):
     retry_delay_seconds: float = Field(default=0.1, gt=0)
     shutdown_timeout_seconds: float = Field(default=30, gt=0)
     worker_health_port: int = 8001
+    worker_metrics_port: int | None = None
+    demo_poison_task_id: UUID | None = None
+
+    @field_validator("demo_poison_task_id", mode="before")
+    @classmethod
+    def empty_poison_id(cls, value):
+        return None if value == "" else value
 
     @property
     def postgres_dsn(self) -> str:

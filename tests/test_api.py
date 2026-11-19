@@ -1,11 +1,16 @@
+from contextlib import asynccontextmanager
 from importlib.metadata import version
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from predictiveguard.main import app
 from predictiveguard.schemas import ComponentHealth
+from predictiveguard.telemetry import trace_headers
 
 
 @pytest.fixture
@@ -103,3 +108,54 @@ async def test_process_validates_sensor_ranges(client: AsyncClient) -> None:
     )
 
     assert response.status_code == 422
+
+
+async def test_confirmation_retry_uses_stored_task_trace(client, config, task, monkeypatch):
+    exporter = InMemorySpanExporter()
+    provider = TracerProvider(shutdown_on_exit=False)
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    monkeypatch.setattr("predictiveguard.telemetry.trace.get_tracer", provider.get_tracer)
+    row = {"status": "SUBMITTING", "trace_context": None}
+    published = []
+
+    @asynccontextmanager
+    async def locked(task_id):
+        yield None
+
+    async def ensure(conn, task, status, *, trace_context):
+        if row["trace_context"] is None:
+            row["trace_context"] = trace_context
+        return row
+
+    async def state(conn, task_id, status):
+        row["status"] = status
+
+    async def publish(*args):
+        published.append(trace_headers())
+        if len(published) == 1:
+            raise TimeoutError("AMQP confirm timeout")
+
+    monkeypatch.setattr("predictiveguard.api.tasks.publish", publish)
+    monkeypatch.setattr(
+        app.state, "store", Mock(locked=locked, ensure=ensure, state=state), raising=False
+    )
+    monkeypatch.setattr(app.state, "broker", Mock(), raising=False)
+    monkeypatch.setattr(app.state, "config", config, raising=False)
+    kwargs = {"headers": {"Idempotency-Key": str(task.task_id)}, "json": task.features.model_dump()}
+    try:
+        first = await client.post("/api/v1/tasks", **kwargs)
+        second = await client.post("/api/v1/tasks", **kwargs)
+        third = await client.post("/api/v1/tasks", **kwargs)
+        assert (first.status_code, second.status_code, third.status_code) == (503, 202, 202)
+        assert (
+            first.headers["X-Trace-ID"]
+            == second.headers["X-Trace-ID"]
+            == third.headers["X-Trace-ID"]
+        )
+        assert second.headers["X-Request-Trace-ID"] != second.headers["X-Trace-ID"]
+        assert published == [row["trace_context"]] * 2
+        first_span, second_span, third_span = exporter.get_finished_spans()
+        for retry in (second_span, third_span):
+            assert retry.links[0].context.trace_id == first_span.context.trace_id
+    finally:
+        provider.shutdown()

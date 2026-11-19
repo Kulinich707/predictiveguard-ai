@@ -1,5 +1,7 @@
 import json
 from contextlib import asynccontextmanager
+from threading import Event
+from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
 from predictiveguard import source
@@ -53,3 +55,32 @@ async def test_manifest_contains_only_confirmed_tasks_and_stable_ids(tmp_path, c
     await source.run(path, 1, 0, manifest, run_id)
     assert confirmed[1].task_id == confirmed[0].task_id
     assert len(manifest.read_text().splitlines()) == 2
+
+
+async def test_initial_metrics_export_does_not_delay_publishing(config, task, monkeypatch):
+    @asynccontextmanager
+    async def broker():
+        yield None
+
+    published = Event()
+    export_finished = Event()
+
+    def flush():
+        published.wait(2)
+        export_finished.set()
+
+    async def publish(*args, **kwargs):
+        assert not export_finished.is_set()
+        published.set()
+
+    metrics = Mock(flush=flush, provider=True)
+    monkeypatch.setattr(source, "BatchMetrics", Mock(return_value=metrics))
+    monkeypatch.setattr(source, "make_broker", lambda config: broker())
+    monkeypatch.setattr(source, "declare", AsyncMock())
+    monkeypatch.setattr(source, "publish_wait", publish)
+    monkeypatch.setattr(source, "rows", lambda *args: iter([task.features]))
+    monkeypatch.setattr(source, "settings", config)
+
+    await source.run("unused.csv", 1, 1, None, uuid4())
+    assert export_finished.is_set()
+    metrics.close.assert_called_once()

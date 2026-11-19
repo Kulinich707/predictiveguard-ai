@@ -7,7 +7,6 @@ from uuid import uuid4
 import aio_pika
 import pytest
 from fastapi import FastAPI
-from faststream.rabbit import RabbitMessage
 from httpx import ASGITransport, AsyncClient
 
 from predictiveguard.api.tasks import router
@@ -16,6 +15,12 @@ from predictiveguard.task_store import TaskStore
 from predictiveguard.worker import Worker
 
 pytestmark = pytest.mark.integration
+
+
+def delivery():
+    return Mock(
+        headers={}, correlation_id=None, raw_message=None, ack=AsyncMock(), nack=AsyncMock()
+    )
 
 
 @pytest.fixture
@@ -53,9 +58,9 @@ async def test_duplicate_is_atomic(real_config, store, task, prediction):
     worker = Worker(real_config, model=model, store=store)
     async with worker.broker:
         await declare(worker.broker, real_config)
-        messages = [AsyncMock(spec=RabbitMessage), AsyncMock(spec=RabbitMessage)]
+        messages = [delivery(), delivery()]
         await asyncio.gather(*(worker.handle(task.wire(), msg) for msg in messages))
-        await worker.handle(task.wire(), AsyncMock(spec=RabbitMessage))
+        await worker.handle(task.wire(), delivery())
     row = await store.get(task.task_id)
     assert row["status"] == "SUCCEEDED" and row["attempts"] == 1
     assert model.predict.call_count == 1
@@ -69,8 +74,8 @@ async def test_error_budget_and_invalid_to_real_dlq(real_config, store, task):
     worker = Worker(real_config, model=model, store=store)
     async with worker.broker:
         await declare(worker.broker, real_config)
-        await worker.handle(task.wire(), AsyncMock(spec=RabbitMessage))
-        await worker.handle({"bad": "schema"}, AsyncMock(spec=RabbitMessage))
+        await worker.handle(task.wire(), delivery())
+        await worker.handle({"bad": "schema"}, delivery())
         row = await store.get(task.task_id)
         assert row["status"] == "FAILED" and row["attempts"] == 3
         queue = await worker.broker.declare_queue(topology(real_config)[1])
@@ -205,7 +210,8 @@ asyncio.run(worker.app.run())
             process = start()
             await wait_for(healthy)
             await wait_for(lambda: is_done(crashed_task.task_id))
-            assert (await store.get(crashed_task.task_id))["attempts"] == 2
+            recovered = await store.get(crashed_task.task_id)
+            assert recovered["attempts"] == recovered["deliveries"] == 2
     finally:
         for process in processes:
             if process.poll() is None:
@@ -237,7 +243,7 @@ async def test_confirmation_timeout_is_recoverable(
             assert response.status_code == 503
             assert (await store.get(task.task_id))["status"] == "UNKNOWN"
             worker = Worker(real_config, Mock(predict=Mock(return_value=prediction)), store)
-            await worker.handle(task.wire(), AsyncMock(spec=RabbitMessage))
+            await worker.handle(task.wire(), delivery())
             second = await client.post(
                 "/api/v1/tasks",
                 json=task.features.model_dump(),

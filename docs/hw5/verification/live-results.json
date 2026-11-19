@@ -1,0 +1,1427 @@
+{
+  "successful": {
+    "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+    "spans": [
+      {
+        "name": "publish",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "bf34558fe77b1358",
+        "parent_id": "d4b70eb1e8c2adb4",
+        "duration_ms": 4.339,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "messaging.system": "rabbitmq",
+          "messaging.destination.name": "predictiveguard.tasks",
+          "task.id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53"
+        }
+      },
+      {
+        "name": "POST /api/v1/tasks",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "d4b70eb1e8c2adb4",
+        "parent_id": null,
+        "duration_ms": 14.0,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "http.request.method": "POST",
+          "task.id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+          "http.route": "/api/v1/tasks",
+          "http.response.status_code": "202"
+        }
+      },
+      {
+        "name": "queue.wait",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "ec70571b8b0bbf5f",
+        "parent_id": "bf34558fe77b1358",
+        "duration_ms": 5.489,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {}
+      },
+      {
+        "name": "inference",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "a0cd9b03133ebb36",
+        "parent_id": "c2d554cde4187b7a",
+        "duration_ms": 4.608,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "model.alias": "champion",
+          "model.version": "2",
+          "task.attempt": "1"
+        }
+      },
+      {
+        "name": "inference.delay",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "81471dd673a1439c",
+        "parent_id": "c2d554cde4187b7a",
+        "duration_ms": 501.466,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {}
+      },
+      {
+        "name": "db.write_result",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "f8d5db372abe91c6",
+        "parent_id": "c2d554cde4187b7a",
+        "duration_ms": 3.085,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "db.system.name": "postgresql"
+        }
+      },
+      {
+        "name": "process",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "c2d554cde4187b7a",
+        "parent_id": "bf34558fe77b1358",
+        "duration_ms": 513.343,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "messaging.system": "rabbitmq",
+          "messaging.destination.name": "predictiveguard.tasks",
+          "messaging.rabbitmq.redelivered": false,
+          "messaging.delivery.attempt": "1",
+          "task.id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+          "messaging.queue_wait_ms": 5.488542
+        }
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "2026-11-08T13:49:03.517+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.queue",
+        "message": "Task published",
+        "request_id": "2646f784-e00a-48f2-a297-69887c10d8fc",
+        "task_id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+        "run_id": null,
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "bf34558fe77b1358",
+        "event": "task_published"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:03.518+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.api.tasks",
+        "message": "Task submission accepted",
+        "request_id": "2646f784-e00a-48f2-a297-69887c10d8fc",
+        "task_id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+        "run_id": null,
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "d4b70eb1e8c2adb4",
+        "event": "task_accepted"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:03.519+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.main",
+        "message": "HTTP request completed",
+        "request_id": "2646f784-e00a-48f2-a297-69887c10d8fc",
+        "task_id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+        "run_id": null,
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "d4b70eb1e8c2adb4",
+        "method": "POST",
+        "route": "/api/v1/tasks",
+        "status_code": 202,
+        "duration_ms": 14.487
+      },
+      {
+        "timestamp": "2026-11-08T13:49:03.519+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "__main__",
+        "message": "Task delivered",
+        "request_id": "-",
+        "task_id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+        "run_id": null,
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "c2d554cde4187b7a",
+        "event": "task_delivered",
+        "queue_wait_ms": 5.488542,
+        "worker": "f337d82e713d"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.031+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "__main__",
+        "message": "Task result stored",
+        "request_id": "-",
+        "task_id": "f48a0c86-d8be-45f0-8b9b-5dda3ec7fb53",
+        "run_id": null,
+        "trace_id": "3ffedfa9f541c3ca9b7f6356adac6fd7",
+        "span_id": "f8d5db372abe91c6",
+        "event": "task_succeeded",
+        "attempt": 1
+      }
+    ]
+  },
+  "poison": {
+    "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+    "spans": [
+      {
+        "name": "publish",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "85e4594409d82d43",
+        "parent_id": "9da839e6aec9354a",
+        "duration_ms": 1.255,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "messaging.system": "rabbitmq",
+          "messaging.destination.name": "predictiveguard.tasks",
+          "task.id": "00000000-0000-4000-8000-000000000005"
+        }
+      },
+      {
+        "name": "POST /api/v1/tasks",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "9da839e6aec9354a",
+        "parent_id": null,
+        "duration_ms": 3.113,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {
+          "http.request.method": "POST",
+          "task.id": "00000000-0000-4000-8000-000000000005",
+          "http.route": "/api/v1/tasks",
+          "http.response.status_code": "202"
+        }
+      },
+      {
+        "name": "queue.wait",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "d3e13d61ee0da52e",
+        "parent_id": "85e4594409d82d43",
+        "duration_ms": 504.374,
+        "status": "STATUS_CODE_UNSET",
+        "events": [],
+        "attributes": {}
+      },
+      {
+        "name": "inference",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "d95efd7d982ad55f",
+        "parent_id": "3d244057c709c760",
+        "duration_ms": 0.962,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception"
+        ],
+        "attributes": {
+          "model.alias": "champion",
+          "model.version": "2",
+          "task.attempt": "1"
+        }
+      },
+      {
+        "name": "inference",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "2e48a6e59b24c04b",
+        "parent_id": "3d244057c709c760",
+        "duration_ms": 0.145,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception"
+        ],
+        "attributes": {
+          "model.alias": "champion",
+          "model.version": "2",
+          "task.attempt": "2"
+        }
+      },
+      {
+        "name": "inference",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "00063b36c18fa877",
+        "parent_id": "3d244057c709c760",
+        "duration_ms": 0.159,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception"
+        ],
+        "attributes": {
+          "model.alias": "champion",
+          "model.version": "2",
+          "task.attempt": "3"
+        }
+      },
+      {
+        "name": "publish DLQ",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "1feb0b88a3ec9a83",
+        "parent_id": "3d244057c709c760",
+        "duration_ms": 2.324,
+        "status": "STATUS_CODE_ERROR",
+        "events": [],
+        "attributes": {}
+      },
+      {
+        "name": "process",
+        "service": "pg-worker",
+        "instance": "f337d82e713d",
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "3d244057c709c760",
+        "parent_id": "85e4594409d82d43",
+        "duration_ms": 320.22,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception",
+          "exception",
+          "exception"
+        ],
+        "attributes": {
+          "messaging.system": "rabbitmq",
+          "messaging.destination.name": "predictiveguard.tasks",
+          "messaging.rabbitmq.redelivered": false,
+          "messaging.delivery.attempt": "1",
+          "task.id": "00000000-0000-4000-8000-000000000005",
+          "messaging.queue_wait_ms": 504.373792
+        }
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "2026-11-08T13:49:03.530+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.queue",
+        "message": "Task published",
+        "request_id": "9a048055-0f95-483f-8763-92386075d18b",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "85e4594409d82d43",
+        "event": "task_published"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:03.531+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.main",
+        "message": "HTTP request completed",
+        "request_id": "9a048055-0f95-483f-8763-92386075d18b",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "9da839e6aec9354a",
+        "method": "POST",
+        "route": "/api/v1/tasks",
+        "status_code": 202,
+        "duration_ms": 3.102
+      },
+      {
+        "timestamp": "2026-11-08T13:49:03.531+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.api.tasks",
+        "message": "Task submission accepted",
+        "request_id": "9a048055-0f95-483f-8763-92386075d18b",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "9da839e6aec9354a",
+        "event": "task_accepted"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.034+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "__main__",
+        "message": "Task delivered",
+        "request_id": "-",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "3d244057c709c760",
+        "event": "task_delivered",
+        "queue_wait_ms": 504.373792,
+        "worker": "f337d82e713d"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.036+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "ERROR",
+        "logger": "__main__",
+        "message": "Scoring attempt failed",
+        "request_id": "-",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "3d244057c709c760",
+        "event": "task_attempt_failed",
+        "attempt": 1,
+        "exception": {
+          "type": "RuntimeError",
+          "stacktrace": [
+            "/app/src/predictiveguard/worker.py:259 in process",
+            "/usr/local/lib/python3.12/concurrent/futures/thread.py:59 in run",
+            "/app/src/predictiveguard/worker.py:236 in predict"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.139+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "ERROR",
+        "logger": "__main__",
+        "message": "Scoring attempt failed",
+        "request_id": "-",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "3d244057c709c760",
+        "event": "task_attempt_failed",
+        "attempt": 2,
+        "exception": {
+          "type": "RuntimeError",
+          "stacktrace": [
+            "/app/src/predictiveguard/worker.py:259 in process",
+            "/usr/local/lib/python3.12/concurrent/futures/thread.py:59 in run",
+            "/app/src/predictiveguard/worker.py:236 in predict"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.246+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "ERROR",
+        "logger": "__main__",
+        "message": "Scoring attempt failed",
+        "request_id": "-",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "3d244057c709c760",
+        "event": "task_attempt_failed",
+        "attempt": 3,
+        "exception": {
+          "type": "RuntimeError",
+          "stacktrace": [
+            "/app/src/predictiveguard/worker.py:259 in process",
+            "/usr/local/lib/python3.12/concurrent/futures/thread.py:59 in run",
+            "/app/src/predictiveguard/worker.py:236 in predict"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-11-08T13:49:04.354+00:00",
+        "service": "pg-worker",
+        "env": "dev",
+        "level": "ERROR",
+        "logger": "__main__",
+        "message": "Task sent to DLQ",
+        "request_id": "-",
+        "task_id": "00000000-0000-4000-8000-000000000005",
+        "run_id": null,
+        "trace_id": "e4d9c6940b3981128b99f72a23931b49",
+        "span_id": "1feb0b88a3ec9a83",
+        "event": "task_dlq"
+      }
+    ]
+  },
+  "overflow": {
+    "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+    "spans": [
+      {
+        "name": "publish",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+        "span_id": "352a9dd1435449cc",
+        "parent_id": "0622fb39ca4ea7eb",
+        "duration_ms": 1.444,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception"
+        ],
+        "attributes": {
+          "messaging.system": "rabbitmq",
+          "messaging.destination.name": "predictiveguard.tasks",
+          "task.id": "a98f5076-3c7e-46b3-9b91-ed2e269ec6ad"
+        }
+      },
+      {
+        "name": "POST /api/v1/tasks",
+        "service": "pg-api",
+        "instance": "2bb23d5e2bbc",
+        "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+        "span_id": "0622fb39ca4ea7eb",
+        "parent_id": null,
+        "duration_ms": 4.581,
+        "status": "STATUS_CODE_ERROR",
+        "events": [
+          "exception"
+        ],
+        "attributes": {
+          "http.request.method": "POST",
+          "task.id": "a98f5076-3c7e-46b3-9b91-ed2e269ec6ad",
+          "http.route": "/api/v1/tasks",
+          "http.response.status_code": "503"
+        }
+      }
+    ],
+    "logs": [
+      {
+        "timestamp": "2026-11-08T13:49:18.588+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "WARNING",
+        "logger": "predictiveguard.queue",
+        "message": "RabbitMQ rejected publication",
+        "request_id": "676a5988-9e96-4632-aedb-483e5ab40686",
+        "task_id": "a98f5076-3c7e-46b3-9b91-ed2e269ec6ad",
+        "run_id": null,
+        "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+        "span_id": "352a9dd1435449cc",
+        "event": "broker_nack"
+      },
+      {
+        "timestamp": "2026-11-08T13:49:18.590+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "WARNING",
+        "logger": "predictiveguard.api.tasks",
+        "message": "Queue is full; retry with same Idempotency-Key",
+        "request_id": "676a5988-9e96-4632-aedb-483e5ab40686",
+        "task_id": "a98f5076-3c7e-46b3-9b91-ed2e269ec6ad",
+        "run_id": null,
+        "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+        "span_id": "0622fb39ca4ea7eb",
+        "event": "api_unavailable",
+        "status_code": 503
+      },
+      {
+        "timestamp": "2026-11-08T13:49:18.591+00:00",
+        "service": "pg-api",
+        "env": "dev",
+        "level": "INFO",
+        "logger": "predictiveguard.main",
+        "message": "HTTP request completed",
+        "request_id": "676a5988-9e96-4632-aedb-483e5ab40686",
+        "task_id": "a98f5076-3c7e-46b3-9b91-ed2e269ec6ad",
+        "run_id": null,
+        "trace_id": "148a5a22f0cc5966d552a96610cb96e0",
+        "span_id": "0622fb39ca4ea7eb",
+        "method": "POST",
+        "route": "/api/v1/tasks",
+        "status_code": 503,
+        "duration_ms": 4.533
+      }
+    ]
+  },
+  "scale_experiment": {
+    "start": 1794145743,
+    "scale": 1794145817,
+    "batch_end": 1794145880,
+    "summary": {
+      "timestamp": "2026-11-08T13:51:20.109+00:00",
+      "service": "pg-source",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Batch completed",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": "95009517-9fcc-41ae-a68d-f3043cde84ba",
+      "trace_id": null,
+      "span_id": null,
+      "event": "batch_completed",
+      "duration_ms": 135700.732,
+      "accepted": 480,
+      "retries": 503
+    },
+    "one_worker": {
+      "source_tasks_per_second": {
+        "promql": "sum(rate(pg_source_published_total[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145805,
+              "1.9180819180819177"
+            ]
+          }
+        ]
+      },
+      "worker_tasks_per_second": {
+        "promql": "sum(rate(pg_worker_tasks_total{result=\"ok\"}[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145805,
+              "1.96"
+            ]
+          }
+        ]
+      },
+      "by_worker_tasks_per_second": {
+        "promql": "sum by(instance) (rate(pg_worker_tasks_total{result=\"ok\"}[30s]))",
+        "result": [
+          {
+            "metric": {
+              "instance": "172.23.0.10:9464"
+            },
+            "value": [
+              1794145805,
+              "1.96"
+            ]
+          }
+        ]
+      },
+      "inference_p95_seconds": {
+        "promql": "histogram_quantile(0.95, sum by(le) (rate(pg_worker_inference_seconds_bucket[30s])))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145805,
+              "0.52375"
+            ]
+          }
+        ]
+      },
+      "ready": {
+        "promql": "rabbitmq_detailed_queue_messages_ready{queue=\"predictiveguard.tasks\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_ready",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks",
+              "vhost": "/"
+            },
+            "value": [
+              1794145805,
+              "99"
+            ]
+          }
+        ]
+      },
+      "unacked": {
+        "promql": "rabbitmq_detailed_queue_messages_unacked{queue=\"predictiveguard.tasks\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_unacked",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks",
+              "vhost": "/"
+            },
+            "value": [
+              1794145805,
+              "1"
+            ]
+          }
+        ]
+      },
+      "dlq_ready": {
+        "promql": "rabbitmq_detailed_queue_messages_ready{queue=\"predictiveguard.tasks.dlq\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_ready",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks.dlq",
+              "vhost": "/"
+            },
+            "value": [
+              1794145805,
+              "1"
+            ]
+          }
+        ]
+      },
+      "broker_nacks_per_second": {
+        "promql": "sum(rate(pg_source_rejected_total[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145805,
+              "3.556443556443556"
+            ]
+          }
+        ]
+      }
+    },
+    "two_workers": {
+      "source_tasks_per_second": {
+        "promql": "sum(rate(pg_source_published_total[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145874,
+              "3.8376973815710573"
+            ]
+          }
+        ]
+      },
+      "worker_tasks_per_second": {
+        "promql": "sum(rate(pg_worker_tasks_total{result=\"ok\"}[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145874,
+              "3.8800784031361255"
+            ]
+          }
+        ]
+      },
+      "by_worker_tasks_per_second": {
+        "promql": "sum by(instance) (rate(pg_worker_tasks_total{result=\"ok\"}[30s]))",
+        "result": [
+          {
+            "metric": {
+              "instance": "172.23.0.10:9464"
+            },
+            "value": [
+              1794145874,
+              "1.9600784031361254"
+            ]
+          },
+          {
+            "metric": {
+              "instance": "172.23.0.12:9464"
+            },
+            "value": [
+              1794145874,
+              "1.92"
+            ]
+          }
+        ]
+      },
+      "inference_p95_seconds": {
+        "promql": "histogram_quantile(0.95, sum by(le) (rate(pg_worker_inference_seconds_bucket[30s])))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145874,
+              "0.52375"
+            ]
+          }
+        ]
+      },
+      "ready": {
+        "promql": "rabbitmq_detailed_queue_messages_ready{queue=\"predictiveguard.tasks\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_ready",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks",
+              "vhost": "/"
+            },
+            "value": [
+              1794145874,
+              "100"
+            ]
+          }
+        ]
+      },
+      "unacked": {
+        "promql": "rabbitmq_detailed_queue_messages_unacked{queue=\"predictiveguard.tasks\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_unacked",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks",
+              "vhost": "/"
+            },
+            "value": [
+              1794145874,
+              "2"
+            ]
+          }
+        ]
+      },
+      "dlq_ready": {
+        "promql": "rabbitmq_detailed_queue_messages_ready{queue=\"predictiveguard.tasks.dlq\"}",
+        "result": [
+          {
+            "metric": {
+              "__name__": "rabbitmq_detailed_queue_messages_ready",
+              "instance": "rabbitmq:15692",
+              "job": "rabbitmq",
+              "queue": "predictiveguard.tasks.dlq",
+              "vhost": "/"
+            },
+            "value": [
+              1794145874,
+              "1"
+            ]
+          }
+        ]
+      },
+      "broker_nacks_per_second": {
+        "promql": "sum(rate(pg_source_rejected_total[30s]))",
+        "result": [
+          {
+            "metric": {},
+            "value": [
+              1794145874,
+              "3.517889266440136"
+            ]
+          }
+        ]
+      }
+    },
+    "reconciled_succeeded": 480
+  },
+  "alert_rules": [
+    {
+      "uid": "pg-queue-high",
+      "state": "firing",
+      "health": "ok",
+      "duration": 60,
+      "lastEvaluation": "2026-11-08T13:51:20Z",
+      "query": "(max(max by(queue) (rabbitmq_detailed_queue_messages_ready) / on(queue) max by(queue) (pg_queue_limit > 0)) > bool 0.90) or vector(0)"
+    },
+    {
+      "uid": "pg-dlq-nonempty",
+      "state": "firing",
+      "health": "ok",
+      "duration": 20,
+      "lastEvaluation": "2026-11-08T13:51:20Z",
+      "query": "(max(rabbitmq_detailed_queue_messages_ready and on(queue) label_replace(pg_queue_limit, \"queue\", \"$1.dlq\", \"queue\", \"(.*)\")) > bool 0) or vector(0)"
+    }
+  ],
+  "shutdown_events": [
+    {
+      "timestamp": "2026-11-08T13:52:09.701+00:00",
+      "service": "pg-worker",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Worker shutdown started",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": null,
+      "trace_id": null,
+      "span_id": null,
+      "event": "shutdown_started",
+      "worker": "f337d82e713d"
+    },
+    {
+      "timestamp": "2026-11-08T13:52:09.711+00:00",
+      "service": "pg-worker",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Worker shutdown completed",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": null,
+      "trace_id": null,
+      "span_id": null,
+      "event": "shutdown_finished",
+      "worker": "f337d82e713d"
+    },
+    {
+      "timestamp": "2026-11-08T13:52:09.702+00:00",
+      "service": "pg-worker",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Worker shutdown started",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": null,
+      "trace_id": null,
+      "span_id": null,
+      "event": "shutdown_started",
+      "worker": "e20940587658"
+    },
+    {
+      "timestamp": "2026-11-08T13:52:09.711+00:00",
+      "service": "pg-worker",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Worker shutdown completed",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": null,
+      "trace_id": null,
+      "span_id": null,
+      "event": "shutdown_finished",
+      "worker": "e20940587658"
+    }
+  ],
+  "no_observability": {
+    "running": [
+      "predictiveguard-hw5-worker-1",
+      "predictiveguard-hw5-app-1",
+      "predictiveguard-hw5-mlflow-1",
+      "predictiveguard-hw5-rabbitmq-1",
+      "predictiveguard-hw5-app-db-1",
+      "predictiveguard-hw5-mlflow-db-1"
+    ],
+    "task": {
+      "task_id": "2e9d2905-8782-4e08-a343-4674b7bca162",
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "result": {
+        "model": {
+          "name": "PredictiveGuardFailureModel",
+          "alias": "champion",
+          "run_id": "57edaf4be7384a6da2b4022c14a4a803",
+          "version": "2"
+        },
+        "prediction": "no_failure",
+        "failure_probability": 0.001519
+      },
+      "error": null,
+      "created_at": "2026-11-08T13:54:00.986746+00:00",
+      "updated_at": "2026-11-08T13:54:01.512189+00:00",
+      "inference_seconds": 0.005930291000140642,
+      "delay_seconds": 0.502310001000069,
+      "total_seconds": 0.52619
+    }
+  },
+  "batch_6000": {
+    "reconciled_succeeded": 6000,
+    "summary": {
+      "timestamp": "2026-11-08T14:05:32.898+00:00",
+      "service": "pg-source",
+      "env": "dev",
+      "level": "INFO",
+      "logger": "__main__",
+      "message": "Batch completed",
+      "request_id": "-",
+      "task_id": null,
+      "run_id": "40000000-0000-4000-8000-000000006002",
+      "trace_id": null,
+      "span_id": null,
+      "event": "batch_completed",
+      "duration_ms": 24095.902,
+      "accepted": 6000,
+      "retries": 553
+    },
+    "per_instance_samples": [
+      {
+        "log": {
+          "timestamp": "2026-11-08T14:05:33.306+00:00",
+          "service": "pg-worker",
+          "env": "dev",
+          "level": "INFO",
+          "logger": "__main__",
+          "message": "Task delivered",
+          "request_id": "-",
+          "task_id": "4f3b2950-aef7-570f-8e09-e09ab0a60e4d",
+          "run_id": "40000000-0000-4000-8000-000000006002",
+          "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+          "span_id": "be31f477d0568d00",
+          "event": "task_delivered",
+          "queue_wait_ms": 412.671875,
+          "worker": "9f819ea89099"
+        },
+        "trace": [
+          {
+            "name": "publish",
+            "service": "pg-source",
+            "instance": "82670758d4ae",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "1b88d3f35047e6a7",
+            "parent_id": "549c80feb5e33b3a",
+            "duration_ms": 0.784,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "messaging.system": "rabbitmq",
+              "messaging.destination.name": "predictiveguard.tasks",
+              "task.id": "4f3b2950-aef7-570f-8e09-e09ab0a60e4d"
+            }
+          },
+          {
+            "name": "source.task",
+            "service": "pg-source",
+            "instance": "82670758d4ae",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "549c80feb5e33b3a",
+            "parent_id": null,
+            "duration_ms": 0.848,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "task.id": "4f3b2950-aef7-570f-8e09-e09ab0a60e4d",
+              "batch.id": "40000000-0000-4000-8000-000000006002"
+            }
+          },
+          {
+            "name": "queue.wait",
+            "service": "pg-worker",
+            "instance": "9f819ea89099",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "5a40e30ae59055ba",
+            "parent_id": "1b88d3f35047e6a7",
+            "duration_ms": 412.672,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {}
+          },
+          {
+            "name": "inference",
+            "service": "pg-worker",
+            "instance": "9f819ea89099",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "4eaac7e5b9c7c830",
+            "parent_id": "be31f477d0568d00",
+            "duration_ms": 0.826,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "model.alias": "champion",
+              "model.version": "2",
+              "task.attempt": "1"
+            }
+          },
+          {
+            "name": "inference.delay",
+            "service": "pg-worker",
+            "instance": "9f819ea89099",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "b781098e5aff4ab4",
+            "parent_id": "be31f477d0568d00",
+            "duration_ms": 26.028,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {}
+          },
+          {
+            "name": "db.write_result",
+            "service": "pg-worker",
+            "instance": "9f819ea89099",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "6db8e7abeeab463c",
+            "parent_id": "be31f477d0568d00",
+            "duration_ms": 0.285,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "db.system.name": "postgresql"
+            }
+          },
+          {
+            "name": "process",
+            "service": "pg-worker",
+            "instance": "9f819ea89099",
+            "trace_id": "1d0c8d067186713a0cec9829f2237a98",
+            "span_id": "be31f477d0568d00",
+            "parent_id": "1b88d3f35047e6a7",
+            "duration_ms": 28.27,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "messaging.system": "rabbitmq",
+              "messaging.destination.name": "predictiveguard.tasks",
+              "messaging.rabbitmq.redelivered": false,
+              "messaging.delivery.minimum_attempt": "1",
+              "batch.id": "40000000-0000-4000-8000-000000006002",
+              "task.id": "4f3b2950-aef7-570f-8e09-e09ab0a60e4d",
+              "messaging.queue_wait_ms": 412.671875
+            }
+          }
+        ]
+      },
+      {
+        "log": {
+          "timestamp": "2026-11-08T14:05:33.298+00:00",
+          "service": "pg-worker",
+          "env": "dev",
+          "level": "INFO",
+          "logger": "__main__",
+          "message": "Task delivered",
+          "request_id": "-",
+          "task_id": "84fd09a1-be16-5f82-a117-7c23ec825ed9",
+          "run_id": "40000000-0000-4000-8000-000000006002",
+          "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+          "span_id": "624269ed54679061",
+          "event": "task_delivered",
+          "queue_wait_ms": 406.752083,
+          "worker": "2e4ab73a9ba5"
+        },
+        "trace": [
+          {
+            "name": "publish",
+            "service": "pg-source",
+            "instance": "82670758d4ae",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "20bcef236050468f",
+            "parent_id": "6f1bc25c292d7087",
+            "duration_ms": 0.496,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "messaging.system": "rabbitmq",
+              "messaging.destination.name": "predictiveguard.tasks",
+              "task.id": "84fd09a1-be16-5f82-a117-7c23ec825ed9"
+            }
+          },
+          {
+            "name": "source.task",
+            "service": "pg-source",
+            "instance": "82670758d4ae",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "6f1bc25c292d7087",
+            "parent_id": null,
+            "duration_ms": 0.546,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "task.id": "84fd09a1-be16-5f82-a117-7c23ec825ed9",
+              "batch.id": "40000000-0000-4000-8000-000000006002"
+            }
+          },
+          {
+            "name": "queue.wait",
+            "service": "pg-worker",
+            "instance": "2e4ab73a9ba5",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "5a05b52e641c0f11",
+            "parent_id": "20bcef236050468f",
+            "duration_ms": 406.752,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {}
+          },
+          {
+            "name": "inference",
+            "service": "pg-worker",
+            "instance": "2e4ab73a9ba5",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "da22a8e83fc3ab58",
+            "parent_id": "624269ed54679061",
+            "duration_ms": 0.875,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "model.alias": "champion",
+              "model.version": "2",
+              "task.attempt": "1"
+            }
+          },
+          {
+            "name": "inference.delay",
+            "service": "pg-worker",
+            "instance": "2e4ab73a9ba5",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "5f603bb87aee78be",
+            "parent_id": "624269ed54679061",
+            "duration_ms": 25.696,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {}
+          },
+          {
+            "name": "db.write_result",
+            "service": "pg-worker",
+            "instance": "2e4ab73a9ba5",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "f0195267c5aa5a18",
+            "parent_id": "624269ed54679061",
+            "duration_ms": 0.307,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "db.system.name": "postgresql"
+            }
+          },
+          {
+            "name": "process",
+            "service": "pg-worker",
+            "instance": "2e4ab73a9ba5",
+            "trace_id": "9c746aac506d1d9f6418186925fb5faf",
+            "span_id": "624269ed54679061",
+            "parent_id": "20bcef236050468f",
+            "duration_ms": 29.816,
+            "status": "STATUS_CODE_UNSET",
+            "events": [],
+            "attributes": {
+              "messaging.system": "rabbitmq",
+              "messaging.destination.name": "predictiveguard.tasks",
+              "messaging.rabbitmq.redelivered": false,
+              "messaging.delivery.minimum_attempt": "1",
+              "batch.id": "40000000-0000-4000-8000-000000006002",
+              "task.id": "84fd09a1-be16-5f82-a117-7c23ec825ed9",
+              "messaging.queue_wait_ms": 406.752083
+            }
+          }
+        ]
+      }
+    ],
+    "backpressure_example": {
+      "log": {
+        "timestamp": "2026-11-08T14:05:08.902+00:00",
+        "service": "pg-source",
+        "env": "dev",
+        "level": "WARNING",
+        "logger": "predictiveguard.queue",
+        "message": "Batch source is backing off",
+        "request_id": "-",
+        "task_id": "952c4199-d9e0-5104-a6ab-8a81f590d7e9",
+        "run_id": "40000000-0000-4000-8000-000000006002",
+        "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+        "span_id": "e2bb2f9220acf27d",
+        "event": "source_backpressure",
+        "attempt": 1,
+        "retry_seconds": 0.03149565990688577
+      },
+      "spans": [
+        {
+          "name": "source.task",
+          "service": "pg-source",
+          "instance": "82670758d4ae",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "1e6751acf26e1b75",
+          "parent_id": null,
+          "duration_ms": 33.747,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {
+            "task.id": "952c4199-d9e0-5104-a6ab-8a81f590d7e9",
+            "batch.id": "40000000-0000-4000-8000-000000006002"
+          }
+        },
+        {
+          "name": "publish",
+          "service": "pg-source",
+          "instance": "82670758d4ae",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "7482f5c0be57a855",
+          "parent_id": "1e6751acf26e1b75",
+          "duration_ms": 0.527,
+          "status": "STATUS_CODE_ERROR",
+          "events": [
+            "exception"
+          ],
+          "attributes": {
+            "messaging.system": "rabbitmq",
+            "messaging.destination.name": "predictiveguard.tasks",
+            "task.id": "952c4199-d9e0-5104-a6ab-8a81f590d7e9"
+          }
+        },
+        {
+          "name": "source.backpressure",
+          "service": "pg-source",
+          "instance": "82670758d4ae",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "e2bb2f9220acf27d",
+          "parent_id": "1e6751acf26e1b75",
+          "duration_ms": 32.201,
+          "status": "STATUS_CODE_UNSET",
+          "events": [
+            "Overloaded"
+          ],
+          "attributes": {
+            "attempt": "1",
+            "retry_seconds": 0.03149565990688577
+          }
+        },
+        {
+          "name": "publish",
+          "service": "pg-source",
+          "instance": "82670758d4ae",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "f3864bc5e90ee9c7",
+          "parent_id": "1e6751acf26e1b75",
+          "duration_ms": 0.823,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {
+            "messaging.system": "rabbitmq",
+            "messaging.destination.name": "predictiveguard.tasks",
+            "task.id": "952c4199-d9e0-5104-a6ab-8a81f590d7e9"
+          }
+        },
+        {
+          "name": "queue.wait",
+          "service": "pg-worker",
+          "instance": "2e4ab73a9ba5",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "90c93ff8c1f0af2e",
+          "parent_id": "f3864bc5e90ee9c7",
+          "duration_ms": 357.295,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {}
+        },
+        {
+          "name": "process",
+          "service": "pg-worker",
+          "instance": "2e4ab73a9ba5",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "757ca628b738e292",
+          "parent_id": "f3864bc5e90ee9c7",
+          "duration_ms": 28.191,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {
+            "messaging.system": "rabbitmq",
+            "messaging.destination.name": "predictiveguard.tasks",
+            "messaging.rabbitmq.redelivered": false,
+            "messaging.delivery.minimum_attempt": "1",
+            "batch.id": "40000000-0000-4000-8000-000000006002",
+            "task.id": "952c4199-d9e0-5104-a6ab-8a81f590d7e9",
+            "messaging.queue_wait_ms": 357.295166
+          }
+        },
+        {
+          "name": "inference",
+          "service": "pg-worker",
+          "instance": "2e4ab73a9ba5",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "e6e80227d6f086ad",
+          "parent_id": "757ca628b738e292",
+          "duration_ms": 0.777,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {
+            "model.alias": "champion",
+            "model.version": "2",
+            "task.attempt": "1"
+          }
+        },
+        {
+          "name": "inference.delay",
+          "service": "pg-worker",
+          "instance": "2e4ab73a9ba5",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "99d5e24976af0182",
+          "parent_id": "757ca628b738e292",
+          "duration_ms": 25.448,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {}
+        },
+        {
+          "name": "db.write_result",
+          "service": "pg-worker",
+          "instance": "2e4ab73a9ba5",
+          "trace_id": "2c122972498ff774b7a4b76f8b33f348",
+          "span_id": "8c1b1ad6e0394170",
+          "parent_id": "757ca628b738e292",
+          "duration_ms": 0.462,
+          "status": "STATUS_CODE_UNSET",
+          "events": [],
+          "attributes": {
+            "db.system.name": "postgresql"
+          }
+        }
+      ]
+    },
+    "start": 1794146707,
+    "source_exit": 1794146733
+  },
+  "exemplar": {
+    "series": {
+      "__name__": "pg_worker_inference_seconds_bucket",
+      "instance": "172.23.0.10:9464",
+      "job": "pg-worker",
+      "le": "0.525"
+    },
+    "sample": {
+      "labels": {
+        "trace_id": "32e772bcced4434fe330f85ba2352b21"
+      },
+      "value": "0.5044036669999059",
+      "timestamp": 1794145748.603
+    }
+  },
+  "observability_memory_mib": 592.14,
+  "total_project_memory_mib": 1669.53,
+  "grafana_down_v_reprovisioning": {
+    "sources": [
+      "pg-loki",
+      "pg-prometheus",
+      "pg-tempo"
+    ],
+    "panels": 12,
+    "rules": [
+      "pg-dlq-nonempty",
+      "pg-queue-high"
+    ]
+  },
+  "grafana_ui_verified": [
+    "Dashboard plots and worker variable",
+    "Loki to Tempo by trace_id",
+    "Tempo to Loki by trace_id"
+  ],
+  "tempo_after_compaction": {
+    "health": "healthy",
+    "oom_killed": false,
+    "restart_count": 0,
+    "compaction_log": [
+      "level=info ts=2026-11-08T14:06:17.642564755Z caller=compactor.go:277 msg=\"wrote compacted block\" version=vParquet4 tenantID=single-tenant blockID=7b0983b7-a900-4ba2-b507-340771fcd5c8 startTime=\"2026-11-08 14:02:03 +0000 UTC\" endTime=\"2026-11-08 14:05:33 +0000 UTC\" totalObjects=1559 size=971069 compactionLevel=1 encoding=none totalRecords=1559 bloomShardCount=1 footerSize=18163 replicationFactor=0 dedicatedColumns=[]",
+      "level=info ts=2026-11-08T14:06:17.650088255Z caller=compactor.go:360 msg=\"compaction complete\" elapsed=143.326583ms blockID=7b0983b7-a900-4ba2-b507-340771fcd5c8"
+    ],
+    "sample_traces_retrieved_after_compaction": [
+      "3ffedfa9f541c3ca9b7f6356adac6fd7",
+      "1d0c8d067186713a0cec9829f2237a98",
+      "9c746aac506d1d9f6418186925fb5faf"
+    ]
+  }
+}

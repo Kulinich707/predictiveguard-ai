@@ -1,0 +1,116 @@
+services:
+  loki:
+    image: grafana/loki:${LOKI_IMAGE_TAG:-3.5.7}
+    profiles: [logs, observability]
+    mem_limit: 256m
+    command: [-config.file=/etc/loki/config.yaml]
+    volumes:
+      - ./loki.yaml:/etc/loki/config.yaml:ro
+      - loki_data:/loki
+    healthcheck:
+      test: [CMD, /busybox/wget, -q, -O, /dev/null, http://127.0.0.1:3100/ready]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  alloy:
+    image: grafana/alloy:${ALLOY_IMAGE_TAG:-v1.11.2}
+    profiles: [logs, observability]
+    mem_limit: 192m
+    command: [run, --storage.path=/var/lib/alloy, /etc/alloy/config.alloy]
+    environment:
+      COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}
+      GOMEMLIMIT: 130MiB
+    volumes:
+      - ./log-agent/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy_data:/var/lib/alloy
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  tempo:
+    image: ${COMPOSE_PROJECT_NAME}-tempo:${TEMPO_IMAGE_TAG:-2.9.0}
+    build:
+      context: .
+      dockerfile: Tempo.Dockerfile
+      args:
+        TEMPO_IMAGE_TAG: ${TEMPO_IMAGE_TAG:-2.9.0}
+    profiles: [traces, observability]
+    mem_limit: 320m
+    environment:
+      GOMEMLIMIT: 210MiB
+    restart: unless-stopped
+    stop_grace_period: 30s
+    command: [-config.file=/etc/tempo/config.yaml]
+    volumes:
+      - ./tempo.yaml:/etc/tempo/config.yaml:ro
+      - tempo_data:/var/tempo
+    healthcheck:
+      test: [CMD, /opt/probe/busybox, wget, -q, -O, /dev/null, http://127.0.0.1:3200/ready]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:${COLLECTOR_IMAGE_TAG:-0.138.0}
+    profiles: [traces, metrics, observability]
+    mem_limit: 128m
+    command: [--config=/etc/otelcol/config.yaml]
+    environment:
+      GOMEMLIMIT: 85MiB
+    volumes:
+      - ./otel-collector.yaml:/etc/otelcol/config.yaml:ro
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_IMAGE_TAG:-v3.7.3}
+    profiles: [metrics, observability]
+    mem_limit: 256m
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=2d
+      - --storage.tsdb.retention.size=1GB
+      - --web.enable-otlp-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - 127.0.0.1:${PROMETHEUS_LOCAL_PORT:-9090}:9090
+    healthcheck:
+      test: [CMD, /bin/wget, -q, -O, /dev/null, http://127.0.0.1:9090/-/ready]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_IMAGE_TAG:-12.2.1}
+    profiles: [observability]
+    mem_limit: 256m
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-pg-local-admin}
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GOMEMLIMIT: 190MiB
+    ports:
+      - 127.0.0.1:${GRAFANA_LOCAL_PORT:-3000}:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:3000/api/health]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  alloy_data:
+  loki_data:
+  tempo_data:
+  prometheus_data:
+  grafana_data:

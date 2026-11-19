@@ -1,10 +1,29 @@
+include:
+  - observability/compose.yml
+
+x-runtime: &runtime
+  image: ${COMPOSE_PROJECT_NAME}-runtime:0.2.0
+  build:
+    context: .
+
+x-otel: &otel
+  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4318}
+  OTEL_EXPORTER_OTLP_TIMEOUT: ${OTEL_EXPORTER_OTLP_TIMEOUT:-1}
+  OTEL_TRACES_SAMPLER: ${OTEL_TRACES_SAMPLER:-parentbased_always_on}
+  OTEL_TRACES_SAMPLER_ARG: ${OTEL_TRACES_SAMPLER_ARG:-1}
+  OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED:-false}
+  OTEL_SERVICE_VERSION: ${OTEL_SERVICE_VERSION:-0.2.0}
+  OTEL_DEPLOYMENT_ENVIRONMENT: ${OTEL_DEPLOYMENT_ENVIRONMENT:-dev}
+  OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL:-5000}
+
 services:
   app:
-    build:
-      context: .
+    <<: *runtime
     init: true
     restart: unless-stopped
     environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: pg-api
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -26,7 +45,7 @@ services:
       PUBLISH_TIMEOUT_SECONDS: ${PUBLISH_TIMEOUT_SECONDS:-1}
       INFERENCE_DELAY_SECONDS: ${INFERENCE_DELAY_SECONDS:-0.5}
     ports:
-    - 8000:8000
+    - ${API_LOCAL_PORT:-8000}:8000
     depends_on:
       app-db: &id002
         condition: service_healthy
@@ -57,11 +76,11 @@ services:
           memory: 1G
     networks:
     - predictiveguard
+    - default
   trainer:
     profiles:
     - training
-    build:
-      context: .
+    <<: *runtime
     command:
     - python
     - -m
@@ -83,18 +102,20 @@ services:
     networks:
     - predictiveguard
   mlflow:
-    build:
-      context: .
+    <<: *runtime
+    environment:
+      MLFLOW_SERVER_ENABLE_JOB_EXECUTION: ${MLFLOW_SERVER_ENABLE_JOB_EXECUTION:-false}
     command:
     - mlflow
     - server
     - --host=0.0.0.0
     - --port=5000
+    - --workers=${MLFLOW_SERVER_WORKERS:-1}
     - --allowed-hosts=mlflow:5000,localhost:*,127.0.0.1:*,0.0.0.0:*
     - --backend-store-uri=postgresql+psycopg2://${MLFLOW_DB_USER:-mlflow}:${MLFLOW_DB_PASSWORD:-mlflow}@mlflow-db:5432/${MLFLOW_DB_NAME:-mlflow}
     - --artifacts-destination=/mlflow/artifacts
     ports:
-    - 5050:5000
+    - ${MLFLOW_LOCAL_PORT:-5050}:5000
     depends_on:
       mlflow-db:
         condition: service_healthy
@@ -118,8 +139,7 @@ services:
     networks:
     - predictiveguard
   artifact-init:
-    build:
-      context: .
+    <<: *runtime
     command:
     - sh
     - -c
@@ -133,7 +153,7 @@ services:
     networks:
     - predictiveguard
   app-db:
-    image: postgres:17-alpine
+    image: postgres:${POSTGRES_IMAGE_TAG:-17.11-alpine}
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-predictiveguard}
@@ -153,7 +173,7 @@ services:
     networks:
     - predictiveguard
   mlflow-db:
-    image: postgres:17-alpine
+    image: postgres:${POSTGRES_IMAGE_TAG:-17.11-alpine}
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${MLFLOW_DB_NAME:-mlflow}
@@ -173,14 +193,17 @@ services:
     networks:
     - predictiveguard
   rabbitmq:
-    image: rabbitmq:4.1-management
+    image: rabbitmq:${RABBITMQ_IMAGE_TAG:-4.1.8-management}
+    configs:
+    - source: rabbitmq_plugins
+      target: /etc/rabbitmq/enabled_plugins
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: predictiveguard
       RABBITMQ_DEFAULT_PASS: predictiveguard
     ports:
-    - 127.0.0.1:5672:5672
-    - 127.0.0.1:15672:15672
+    - 127.0.0.1:${RABBITMQ_LOCAL_PORT:-5672}:5672
+    - 127.0.0.1:${RABBITMQ_UI_PORT:-15672}:15672
     volumes:
     - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -194,15 +217,19 @@ services:
       retries: 20
     networks:
     - predictiveguard
+    - default
   worker:
-    build:
-      context: .
+    <<: *runtime
+    logging: *id001
     init: true
     command:
     - python
     - -m
     - predictiveguard.worker
     environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: pg-worker
+      MLFLOW_ENABLE_ARTIFACTS_PROGRESS_BAR: "false"
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -226,7 +253,9 @@ services:
       PREFETCH_COUNT: ${PREFETCH_COUNT:-1}
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
       MAX_ATTEMPTS: ${MAX_ATTEMPTS:-3}
+      DEMO_POISON_TASK_ID: ${DEMO_POISON_TASK_ID:-}
       WORKER_HEALTH_PORT: ${WORKER_HEALTH_PORT:-8001}
+      WORKER_METRICS_PORT: 9464
       SHUTDOWN_TIMEOUT_SECONDS: ${SHUTDOWN_TIMEOUT_SECONDS:-30}
     depends_on:
       app-db: *id002
@@ -245,21 +274,23 @@ services:
       start_period: 60s
     networks:
     - predictiveguard
+    - default
     restart: unless-stopped
   source:
-    build:
-      context: .
+    <<: *runtime
+    init: true
+    logging: *id001
     profiles:
     - batch
     command:
     - python
     - -m
     - predictiveguard.source
-    - --repeats
-    - '10'
-    - --manifest
-    - /tmp/accepted.jsonl
+    - --limit
+    - '6000'
     environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: pg-source
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -287,6 +318,7 @@ services:
       disable: true
     networks:
     - predictiveguard
+    - default
 volumes:
   postgres_data: null
   mlflow_postgres_data: null
@@ -295,3 +327,6 @@ volumes:
 networks:
   predictiveguard:
     driver: bridge
+configs:
+  rabbitmq_plugins:
+    content: "[rabbitmq_management,rabbitmq_prometheus]."
