@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 90
+    spike_limit_mib: 25
+  batch:
+    timeout: 1s
+    send_batch_size: 512
+exporters:
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+    sending_queue:
+      queue_size: 32
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 3s
+      max_elapsed_time: 10s
+  otlphttp/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
+    sending_queue:
+      queue_size: 32
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 3s
+      max_elapsed_time: 10s
+service:
+  telemetry:
+    logs:
+      level: warn
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/tempo]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/prometheus]

@@ -1,0 +1,30 @@
+server:
+  http_listen_port: 3200
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+ingester:
+  trace_idle_period: 10s
+  max_block_duration: 1m
+  max_block_bytes: 524288
+  concurrent_flushes: 1
+  flush_all_on_shutdown: true
+compactor:
+  compaction:
+    block_retention: 48h
+    max_compaction_objects: 2000
+    max_block_bytes: 2097152
+storage:
+  trace:
+    backend: local
+    block:
+      parquet_row_group_size_bytes: 4194304
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+usage_report:
+  reporting_enabled: false

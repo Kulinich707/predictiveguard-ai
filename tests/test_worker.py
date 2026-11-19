@@ -19,10 +19,20 @@ class MemoryStore:
     async def locked(self, task_id):
         yield None
 
-    async def ensure(self, conn, task):
+    async def ensure(self, conn, task, *, trace_context=None):
         if self.row is None:
-            self.row = {"attempts": 0, "status": "PENDING", "error": None}
+            self.row = {
+                "attempts": 0,
+                "status": "PENDING",
+                "error": None,
+                "deliveries": 0,
+                "dlq_confirmed": False,
+            }
         return self.row
+
+    async def delivery(self, conn, task_id):
+        self.row["deliveries"] += 1
+        return self.row["deliveries"]
 
     async def attempt(self, conn, task_id):
         self.row["attempts"] += 1
@@ -33,6 +43,10 @@ class MemoryStore:
 
     async def success(self, conn, task, result, inference_seconds, delay_seconds):
         self.row.update(status="SUCCEEDED", result=result)
+        return inference_seconds + delay_seconds
+
+    async def failed_to_dlq(self, conn, task_id, error):
+        self.row.update(status="FAILED", error=error, dlq_confirmed=True)
 
 
 async def test_broker_handler_success_and_duplicate(config, task, prediction):
@@ -73,6 +87,7 @@ async def test_broker_retry_budget(config, task):
         received.append(body)
 
     async with TestRabbitBroker(worker.broker) as broker:
+        await broker.publish(task.wire(), queue=topology(config)[0])
         await broker.publish(task.wire(), queue=topology(config)[0])
     assert model.predict.call_count == config.max_attempts
     assert store.row["status"] == "FAILED"

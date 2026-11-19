@@ -1,0 +1,918 @@
+{
+  "uid": "pg-pipeline",
+  "title": "Конвейер",
+  "tags": [
+    "predictiveguard",
+    "hw5"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "queue",
+        "label": "Очередь",
+        "type": "query",
+        "current": {
+          "text": "$__all",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "pg-prometheus"
+        },
+        "query": "label_values(pg_queue_limit, queue)",
+        "definition": "label_values(pg_queue_limit, queue)",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true
+      },
+      {
+        "name": "worker",
+        "label": "Воркер",
+        "type": "query",
+        "current": {
+          "text": "$__all",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "pg-prometheus"
+        },
+        "query": "label_values(up{job=\"pg-worker\"}, instance)",
+        "definition": "label_values(up{job=\"pg-worker\"}, instance)",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true
+      },
+      {
+        "name": "service",
+        "label": "Логи сервиса",
+        "type": "custom",
+        "current": {
+          "text": "$__all",
+          "value": "$__all"
+        },
+        "query": "pg-api,pg-source,pg-worker",
+        "includeAll": true,
+        "allValue": "pg-.+",
+        "multi": true
+      },
+      {
+        "name": "task_id",
+        "label": "Task ID / regex",
+        "type": "textbox",
+        "current": {
+          "text": ".+",
+          "value": ".+"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Очередь RabbitMQ",
+      "description": "Горизонтальная линия ограничивает только ready. Unacked показаны отдельно.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "rabbitmq_detailed_queue_messages_ready{queue=~\"$queue\"} and on(queue) pg_queue_limit{queue=~\"$queue\"}",
+          "legendFormat": "Ready",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "rabbitmq_detailed_queue_messages_unacked{queue=~\"$queue\"} and on(queue) pg_queue_limit{queue=~\"$queue\"}",
+          "legendFormat": "Unacked",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "max(pg_queue_limit{queue=~\"$queue\"}) > 0",
+          "legendFormat": "Лимит x-max-length",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: сообщ.",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Скорость конвейера",
+      "description": "На плато скорость источника приближается к сумме worker ok. Выбор worker влияет на разбивку.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_source_published_total[$__rate_interval]))",
+          "legendFormat": "Источник",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_worker_tasks_total{result=\"ok\"}[$__rate_interval]))",
+          "legendFormat": "Воркеры, всего",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum by(instance) (rate(pg_worker_tasks_total{result=\"ok\",instance=~\"$worker\"}[$__rate_interval]))",
+          "legendFormat": "Воркер {{instance}}",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: задач/с",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Латентность inference",
+      "description": "Включает прогноз модели и настроенную задержку. Линия 750 мс — учебная цель для p95 при задержке 500 мс.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.5, sum by(le) (rate(pg_worker_inference_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p50",
+          "exemplar": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(pg_worker_inference_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(pg_worker_inference_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2,
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.75
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Латентность API",
+      "description": "POST /api/v1/tasks, все статусы. Учебная цель для p95 — 250 мс.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.5, sum by(le) (rate(pg_api_duration_seconds_bucket{route=\"/api/v1/tasks\",method=\"POST\"}[$__rate_interval])))",
+          "legendFormat": "p50",
+          "exemplar": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(pg_api_duration_seconds_bucket{route=\"/api/v1/tasks\",method=\"POST\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(pg_api_duration_seconds_bucket{route=\"/api/v1/tasks\",method=\"POST\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2,
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Память процессов RSS",
+      "description": "Память RabbitMQ, API, источника и воркеров. Источник отправляет замеры по OTLP, остальные сервисы опрашивает Prometheus.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "pg_source_resident_memory_bytes",
+          "legendFormat": "Источник",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "process_resident_memory_bytes{job=\"pg-worker\",instance=~\"$worker\"}",
+          "legendFormat": "Воркер {{instance}}",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "process_resident_memory_bytes{job=\"pg-api\"}",
+          "legendFormat": "API",
+          "exemplar": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "rabbitmq_detailed_process_resident_memory_bytes{job=\"rabbitmq\"}",
+          "legendFormat": "RabbitMQ",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Доля ответов 503",
+      "description": "Отношение скорости HTTP 503 к скорости всех POST /api/v1/tasks.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "(sum(rate(pg_api_requests_total{route=\"/api/v1/tasks\",method=\"POST\",status=\"503\"}[$__rate_interval])) or 0 * sum(rate(pg_api_requests_total{route=\"/api/v1/tasks\",method=\"POST\"}[$__rate_interval]))) / (sum(rate(pg_api_requests_total{route=\"/api/v1/tasks\",method=\"POST\"}[$__rate_interval])) > 0)",
+          "legendFormat": "HTTP 503",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Замедление источника",
+      "description": "NACK — отказы публикации. Отдельно показана скорость накопления времени пауз.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_source_rejected_total[$__rate_interval]))",
+          "legendFormat": "NACK/с",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_source_wait_seconds_total[$__rate_interval]))",
+          "legendFormat": "Паузы, с/с",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: /с",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "DLQ",
+      "description": "Глубина DLQ из RabbitMQ. В случае устойчивой ошибки каждая задача после исчерпания попыток увеличивает глубину.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "rabbitmq_detailed_queue_messages_ready{queue=~\"$queue[.]dlq\"}",
+          "legendFormat": "Глубина DLQ",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: сообщ.",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "В работе",
+      "description": "Текущие задачи в обработке по воркерам.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "pg_worker_in_progress{instance=~\"$worker\"}",
+          "legendFormat": "{{instance}}",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: задач",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Ошибки и повторные доставки",
+      "description": "Отдельные ряды для ошибок попыток, итогов задач и повторных доставок RabbitMQ.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum by(result) (rate(pg_worker_tasks_total{result=~\"error|dlq\",instance=~\"$worker\"}[$__rate_interval]))",
+          "legendFormat": "{{result}}",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_worker_redeliveries_total{instance=~\"$worker\"}[$__rate_interval]))",
+          "legendFormat": "Redelivery",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum by(stage) (rate(pg_worker_attempt_failures_total{instance=~\"$worker\"}[$__rate_interval]))",
+          "legendFormat": "Попытки · {{stage}}",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: событий/с",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 12,
+            "lineWidth": 2
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "title": "Полное время задачи",
+      "description": "От создания задачи источником или API до записи успешного результата в PostgreSQL.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.5, sum by(le) (rate(pg_worker_task_latency_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p50",
+          "exemplar": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(pg_worker_task_latency_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "exemplar": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(pg_worker_task_latency_seconds_bucket{instance=~\"$worker\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "SLO · 99% задач за 60 с",
+      "description": "Доля успехов за 60 с среди завершённых задач за 5 минут. Ошибочные итоги и DLQ считаются промахами.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "pg-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "sum(rate(pg_worker_task_latency_seconds_bucket{le=\"60.0\",instance=~\"$worker\"}[5m])) / (sum(rate(pg_worker_tasks_total{instance=~\"$worker\"}[5m])) > 0)",
+          "legendFormat": "Доля в SLO",
+          "exemplar": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "pg-prometheus"
+          },
+          "expr": "vector(0.99)",
+          "legendFormat": "Цель 99%",
+          "exemplar": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Последние ошибки",
+      "description": "Раскройте строку и выберите «Открыть трейс».",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "pg-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "pg-loki"
+          },
+          "refId": "A",
+          "expr": "{service=~\"$service\",level=~\"ERROR|CRITICAL\"}",
+          "maxLines": 100
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 12,
+      "title": "История задачи",
+      "description": "Укажите task_id в верхней части дашборда. По умолчанию показаны последние события с task_id.",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "pg-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "pg-loki"
+          },
+          "refId": "A",
+          "expr": "{service=~\"$service\"} | json | task_id =~ \"$task_id\"",
+          "maxLines": 100
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}

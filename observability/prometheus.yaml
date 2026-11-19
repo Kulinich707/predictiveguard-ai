@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  scrape_protocols: [OpenMetricsText1.0.0, OpenMetricsText0.0.1, PrometheusText0.0.4]
+storage:
+  tsdb:
+    out_of_order_time_window: 30s
+scrape_configs:
+  - job_name: pg-api
+    static_configs:
+      - targets: ["app:8000"]
+  - job_name: pg-worker
+    dns_sd_configs:
+      - names: [worker]
+        type: A
+        port: 9464
+        refresh_interval: 5s
+  - job_name: rabbitmq
+    metrics_path: /metrics/detailed
+    params:
+      family: [queue_coarse_metrics, node_coarse_metrics]
+    static_configs:
+      - targets: ["rabbitmq:15692"]

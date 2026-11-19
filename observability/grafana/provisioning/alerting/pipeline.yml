@@ -1,0 +1,45 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: predictiveguard
+    folder: PredictiveGuard
+    interval: 10s
+    rules:
+      - uid: pg-queue-high
+        title: Рабочая очередь заполнена
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: pg-prometheus
+            model:
+              datasource: {type: prometheus, uid: pg-prometheus}
+              expr: '(max(max by(queue) (rabbitmq_detailed_queue_messages_ready) / on(queue) max by(queue) (pg_queue_limit > 0)) > bool 0.90) or vector(0)'
+              instant: true
+              range: false
+              refId: A
+              intervalMs: 5000
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: 'Доля ready относительно лимита выше 90% не менее минуты.'
+      - uid: pg-dlq-nonempty
+        title: В DLQ есть сообщения
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: pg-prometheus
+            model:
+              datasource: {type: prometheus, uid: pg-prometheus}
+              expr: '(max(rabbitmq_detailed_queue_messages_ready and on(queue) label_replace(pg_queue_limit, "queue", "$1.dlq", "queue", "(.*)")) > bool 0) or vector(0)'
+              instant: true
+              range: false
+              refId: A
+              intervalMs: 5000
+        noDataState: OK
+        execErrState: Error
+        for: 20s
+        annotations:
+          summary: 'Проверить ошибки обработки и повторные попытки в трейсах.'

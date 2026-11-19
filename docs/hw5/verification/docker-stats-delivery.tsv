@@ -1,0 +1,15 @@
+container	memory_usage_limit	memory_percent
+pg-hw5-6000-delivery	48.48MiB / 7.748GiB	0.61%
+predictiveguard-hw5-worker-1	168.7MiB / 7.748GiB	2.13%
+predictiveguard-hw5-worker-2	158.3MiB / 7.748GiB	2.00%
+predictiveguard-hw5-app-1	67MiB / 1GiB	6.54%
+predictiveguard-hw5-mlflow-1	456.3MiB / 7.748GiB	5.75%
+predictiveguard-hw5-tempo-1	108.2MiB / 320MiB	33.81%
+predictiveguard-hw5-grafana-1	121.5MiB / 256MiB	47.45%
+predictiveguard-hw5-alloy-1	88.54MiB / 192MiB	46.11%
+predictiveguard-hw5-otel-collector-1	95.96MiB / 128MiB	74.97%
+predictiveguard-hw5-rabbitmq-1	79.07MiB / 7.748GiB	1.00%
+predictiveguard-hw5-prometheus-1	58.34MiB / 256MiB	22.79%
+predictiveguard-hw5-loki-1	119.6MiB / 256MiB	46.70%
+predictiveguard-hw5-app-db-1	61.63MiB / 7.748GiB	0.78%
+predictiveguard-hw5-mlflow-db-1	37.91MiB / 7.748GiB	0.48%

@@ -2,7 +2,9 @@
 
 Асинхронный FastAPI-сервис для оценки риска отказа оборудования: AI4I 2020 → EDA и эксперименты в MLflow → Model Registry → RabbitMQ → FastStream worker → PostgreSQL.
 
-ДЗ №4: [архитектура, измерения и воспроизведение экспериментов](docs/hw4/README.md).
+**ДЗ №5 — наблюдаемость.** [Запуск, сценарий защиты, запросы и результаты замеров](docs/hw5/README.md).
+
+ДЗ №4 — [результаты предыдущих экспериментов](docs/hw4/runs/summary.json).
 
 ## Требования и установка
 
@@ -168,4 +170,6 @@ ghcr.io/<owner>/<repository>:latest
 - `docker-compose.local.yml` — публикация PostgreSQL на localhost для API на хосте;
 - `docker-compose.yml` — MLflow, отдельные хранилища, RabbitMQ, API, worker, CSV source и ручной trainer.
 - `src/predictiveguard/worker.py`, `source.py`, `task_store.py`, `api/tasks.py` — конвейер ДЗ №4.
-- `docs/hw4/` — измерения, графики и отчёт.
+- `observability/` — Compose-профили, настройки сборщиков и хранилищ, Grafana provisioning.
+- `docs/hw5/` — запуск стенда, сценарий защиты и данные фактических прогонов.
+- `docs/hw4/` — предыдущие измерения и графики.

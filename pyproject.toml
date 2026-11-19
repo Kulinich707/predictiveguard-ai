@@ -19,6 +19,9 @@ dependencies = [
     "faststream[rabbit]>=0.6.0,<0.7.0",
     "aiohttp>=3.12,<4",
     "psutil>=7,<8",
+    "opentelemetry-sdk>=1.45,<2",
+    "opentelemetry-exporter-otlp-proto-http>=1.45,<2",
+    "prometheus-client>=0.23,<1",
 ]
 
 [dependency-groups]

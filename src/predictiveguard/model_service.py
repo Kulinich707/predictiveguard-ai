@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 import mlflow
@@ -7,6 +8,8 @@ from mlflow.pyfunc import load_model
 
 from predictiveguard.config import Settings
 from predictiveguard.schemas import ModelMetadata, ProcessRequest, ProcessResponse
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -23,6 +26,10 @@ class ModelService:
     def is_ready(self) -> bool:
         return self._loaded is not None
 
+    @property
+    def version(self) -> str:
+        return self._loaded.metadata.version if self._loaded else "unloaded"
+
     def load(self, config: Settings) -> None:
         mlflow.set_tracking_uri(config.mlflow_tracking_uri)
         version = MlflowClient().get_model_version_by_alias(config.model_name, config.model_alias)
@@ -34,6 +41,15 @@ class ModelService:
                 version=str(version.version),
                 run_id=version.run_id,
             ),
+        )
+
+        logger.info(
+            "Model loaded from MLflow",
+            extra={
+                "event": "model_loaded",
+                "model_alias": config.model_alias,
+                "model_version": self.version,
+            },
         )
 
     def predict(self, request: ProcessRequest) -> ProcessResponse:
